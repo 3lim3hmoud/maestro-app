@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Maestro Fast Delivery</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg">
+<meta name="theme-color" content="#141311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+:root{
+  --ink:#141311; --ink2:#242219; --paper:#FBF9F4; --panel:#F2EEE3;
+  --gold:#F2B705; --gold-deep:#8a5c00; --bolt:#E8542A;
+  --line:#E4DFCF; --line-strong:#d7d0ba; --muted:#8c8672;
+  --danger:#c1443c; --ok:#3f7a52;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -webkit-tap-highlight-color:transparent;}
+.mono{font-family:'JetBrains Mono',monospace;}
+#app{max-width:430px; margin:0 auto; min-height:100vh; background:var(--paper); position:relative; display:flex; flex-direction:column; box-shadow:0 0 60px rgba(0,0,0,.5);}
+.screen{display:none; flex:1; flex-direction:column; padding-bottom:80px;}
+.screen.active{display:flex; animation:fade .25s ease;}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+
+/* ---------- topbar ---------- */
+.topbar{background:var(--ink); color:#fff; padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:20; border-bottom:2px solid var(--gold);}
+.logo{display:flex; align-items:center; gap:9px;}
+.logo svg{width:32px; height:32px; flex-shrink:0;}
+.logo b{font-weight:900; font-size:19px; letter-spacing:.5px; display:block; line-height:1;}
+.logo span{display:block; font-size:9px; color:var(--gold); letter-spacing:3px; margin-top:3px; font-family:'JetBrains Mono',monospace;}
+.topbar .icons{display:flex; align-items:center; gap:16px; font-size:20px; position:relative;}
+.badge{position:absolute; top:-7px; left:-9px; background:var(--gold); color:var(--ink); font-size:10px; font-weight:700; border-radius:10px; padding:1px 5px; min-width:16px; text-align:center; font-family:'JetBrains Mono',monospace;}
+.back-row{color:#fff; display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+.back-row i{font-size:18px;}
+
+/* ---------- location bar ---------- */
+.locbar{padding:12px 18px; background:var(--ink2); border-bottom:1px solid #333; color:#e7e3d6;}
+.locbar .row{display:flex; align-items:center; gap:6px; font-size:12px; color:#c9c4b0; margin-bottom:8px;}
+.locbar .row.ok{color:var(--gold); font-weight:700;}
+.locbar input{width:100%; border:1px solid #3a382f; border-radius:8px; padding:9px 11px; font-family:inherit; font-size:12px; background:#1b1a15; color:#fff;}
+.locbar input::placeholder{color:#726d5c;}
+.locbar .actions{display:flex; gap:8px; margin-top:9px;}
+.btn-sm{border:1px solid #3a382f; background:#1b1a15; color:#e7e3d6; border-radius:8px; padding:8px 11px; font-size:11px; font-family:inherit; font-weight:500; display:flex; align-items:center; gap:5px;}
+.btn-sm.gold{background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:700;}
+
+/* ---------- content ---------- */
+.content{padding:16px 18px; flex:1; overflow-y:auto;}
+.search{display:flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--line-strong); border-radius:10px; padding:11px 13px; margin-bottom:16px;}
+.search input{border:none; background:none; outline:none; flex:1; font-family:inherit; font-size:13px; color:var(--ink);}
+.search i{color:var(--muted);}
+
+/* ---------- ads ---------- */
+.ads{display:flex; gap:10px; overflow-x:auto; margin-bottom:18px; padding-bottom:2px;}
+.ads::-webkit-scrollbar{display:none;}
+.ad-card{min-width:90%; background:var(--ink); border-radius:16px; padding:20px; color:#fff; position:relative; overflow:hidden; flex-shrink:0; border:1px solid #2a2820;}
+.ad-card::after{content:''; position:absolute; left:-20px; bottom:-30px; width:110px; height:110px; background:var(--gold); opacity:.12; border-radius:50%;}
+.ad-card .tag{background:var(--gold); color:var(--ink); font-size:10px; font-weight:700; padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:10px; letter-spacing:.3px;}
+.ad-card h3{font-size:17px; font-weight:900; margin-bottom:5px;}
+.ad-card p{font-size:11.5px; color:#b8b3a0;}
+.ad-empty{border:1.5px dashed var(--line-strong); border-radius:16px; padding:20px; text-align:center; color:var(--muted); font-size:12px; width:100%;}
+
+/* ---------- categories ---------- */
+.cats{display:flex; gap:8px; overflow-x:auto; margin-bottom:20px;}
+.cats::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0; padding:8px 16px; border-radius:9px; font-size:12.5px; border:1px solid var(--line-strong); background:#fff; font-family:inherit; font-weight:500; color:var(--ink2);}
+.chip.active{background:var(--ink); color:var(--gold); border-color:var(--ink);}
+
+.sec-title{font-size:15px; font-weight:900; margin-bottom:12px; display:flex; justify-content:space-between; align-items:baseline; color:var(--ink);}
+.sec-title span{font-size:11px; color:var(--muted); font-weight:500; font-family:'JetBrains Mono',monospace;}
+
+/* ---------- restaurant grid ---------- */
+.rest-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.rest-card{background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer;}
+.rest-card .thumb{height:88px; background:var(--panel); background-size:cover; background-position:center; position:relative;}
+.rest-card .thumb .cat-tag{position:absolute; top:7px; right:7px; background:rgba(20,19,17,.82); color:var(--gold); font-size:9px; font-weight:700; padding:3px 8px; border-radius:6px;}
+.rest-card .body{padding:10px 11px 12px;}
+.rest-card h4{font-size:13.5px; font-weight:700; margin-bottom:5px; line-height:1.3;}
+.rest-card .meta{font-size:10.5px; color:var(--muted); display:flex; align-items:center; gap:5px;}
+.rest-card .meta i{color:var(--gold-deep); font-size:12px;}
+
+.empty-state{text-align:center; padding:48px 20px; color:var(--muted);}
+.empty-state i{font-size:40px; color:var(--line-strong); display:block; margin-bottom:12px;}
+.empty-state p{font-size:13px; line-height:1.7;}
+
+/* ---------- bottom nav ---------- */
+.bottomnav{position:absolute; bottom:0; left:0; right:0; background:var(--ink); border-top:2px solid var(--gold); display:flex; justify-content:space-around; padding:10px 0 13px; max-width:430px; margin:0 auto;}
+.navbtn{display:flex; flex-direction:column; align-items:center; gap:3px; color:#8a8574; font-size:9.5px; background:none; border:none; font-family:inherit; font-weight:500;}
+.navbtn.active{color:var(--gold);}
+.navbtn i{font-size:19px;}
+
+/* ---------- menu screen ---------- */
+.menu-header{position:relative;}
+.menu-header .cover{height:130px; background:var(--ink); background-size:cover; background-position:center;}
+.menu-header .back{position:absolute; top:16px; right:16px; width:34px; height:34px; background:rgba(255,255,255,.95); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px;}
+.menu-header .info{padding:14px 18px; border-bottom:1px solid var(--line); background:#fff;}
+.menu-header .info h2{font-size:18px; font-weight:900;}
+.menu-header .info .meta{font-size:11.5px; color:var(--muted); margin-top:5px; display:flex; gap:10px; align-items:center;}
+.menu-header .info .meta i{color:var(--gold-deep);}
+.dish{display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line);}
+.dish .d-info h5{font-size:13.5px; font-weight:700; margin-bottom:4px;}
+.dish .d-info .price{font-size:12.5px; color:var(--gold-deep); font-weight:700; font-family:'JetBrains Mono',monospace;}
+.qty-ctrl{display:flex; align-items:center; gap:9px;}
+.qty-ctrl button{width:27px; height:27px; border-radius:50%; border:1px solid var(--line-strong); background:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; color:var(--ink);}
+.qty-ctrl button.add{background:var(--ink); color:var(--gold); border-color:var(--ink);}
+.qty-ctrl span{font-size:13px; min-width:16px; text-align:center; font-family:'JetBrains Mono',monospace; font-weight:700;}
+
+/* ---------- checkout bar ---------- */
+.checkout-bar{position:absolute; bottom:0; left:0; right:0; max-width:430px; margin:0 auto; padding:13px 18px; background:#fff; border-top:1px solid var(--line);}
+.btn-main{width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:11px; padding:14px; font-family:inherit; font-weight:900; font-size:14.5px; display:flex; align-items:center; justify-content:center; gap:9px; letter-spacing:.2px;}
+.btn-main:disabled{background:var(--line-strong); color:#a8a292;}
+
+/* ---------- ticket / cart ---------- */
+.ticket{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; position:relative;}
+.ticket-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:12px; border-bottom:2px dashed var(--line-strong);}
+.ticket-head b{font-size:13px; font-weight:900;}
+.ticket-head span{font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace;}
+.tline{display:flex; align-items:baseline; gap:6px; padding:7px 0; font-size:12.5px;}
+.tline .nm{white-space:nowrap;}
+.tline .dots{flex:1; border-bottom:1px dotted var(--line-strong); transform:translateY(-3px);}
+.tline .pr{white-space:nowrap; font-family:'JetBrains Mono',monospace; font-weight:700;}
+.ticket .totals{border-top:2px dashed var(--line-strong); margin-top:6px; padding-top:12px;}
+.total-row{display:flex; justify-content:space-between; padding:4px 0; font-size:12.5px; color:var(--muted);}
+.total-row.grand{font-weight:900; font-size:16px; color:var(--ink); border-top:1px solid var(--line); margin-top:6px; padding-top:10px;}
+.total-row.grand .pr{font-family:'JetBrains Mono',monospace;}
+
+.pay-opt{display:flex; align-items:center; gap:11px; border:1.5px solid var(--line); border-radius:11px; padding:13px; margin-bottom:9px; cursor:pointer; background:#fff;}
+.pay-opt.selected{border-color:var(--gold); background:#FFFBEF;}
+.pay-opt i{font-size:20px; color:var(--ink); width:24px; text-align:center;}
+.pay-opt .t{flex:1;}
+.pay-opt .t b{font-size:13px; display:block;}
+.pay-opt .t small{font-size:11px; color:var(--muted);}
+.pay-opt .radio{width:17px; height:17px; border-radius:50%; border:2px solid var(--line-strong);}
+.pay-opt.selected .radio{border-color:var(--gold); background:var(--gold);}
+
+.wallet-box{background:var(--ink); color:#fff; border-radius:12px; padding:14px; margin:8px 0 14px; font-size:12px;}
+.wallet-box .lbl{color:#b8b3a0;}
+.wallet-box .num{font-size:18px; font-weight:900; letter-spacing:1px; margin:8px 0; direction:ltr; text-align:center; color:var(--gold); font-family:'JetBrains Mono',monospace;}
+.upload{border:1.5px dashed var(--line-strong); border-radius:11px; padding:18px; text-align:center; color:var(--muted); font-size:12px; cursor:pointer; position:relative; background:#fff;}
+.upload input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+.upload.has-file{border-color:var(--ok); color:var(--ok);}
+
+/* ---------- tracking ---------- */
+.map-box{height:230px; background:#e9e4d3; position:relative; overflow:hidden; border-bottom:1px solid var(--line);}
+.map-box svg{width:100%; height:100%;}
+.status-steps{padding:18px;}
+.step{display:flex; align-items:center; gap:11px; padding:9px 0;}
+.step .dot{width:10px; height:10px; border-radius:50%; background:var(--line-strong); flex-shrink:0;}
+.step.done .dot{background:var(--ok);}
+.step.now .dot{background:var(--gold-deep);}
+.step span{font-size:12.5px; color:var(--muted);}
+.step.done span, .step.now span{color:var(--ink); font-weight:700;}
+.driver-card{display:flex; align-items:center; gap:11px; background:var(--ink); color:#fff; border-radius:14px; padding:13px; margin:0 18px 18px;}
+.driver-card .av{width:40px; height:40px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--ink);}
+.driver-card .n{flex:1;}
+.driver-card .n b{font-size:13px; display:block;}
+.driver-card .n small{font-size:11px; color:#a39d89;}
+.driver-card i{font-size:20px; color:var(--gold);}
+
+/* ---------- admin ---------- */
+.admin-fab{position:fixed; bottom:16px; left:50%; transform:translateX(calc(-215px + 16px)); width:40px; height:40px; background:var(--ink); color:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; z-index:50; border:2px solid var(--gold);}
+.overlay{position:fixed; inset:0; background:rgba(10,9,7,.6); display:none; align-items:flex-end; justify-content:center; z-index:100;}
+.overlay.active{display:flex;}
+.sheet{background:var(--paper); width:100%; max-width:430px; border-radius:20px 20px 0 0; padding:20px 18px 24px; max-height:82vh; overflow-y:auto; position:relative;}
+.sheet h3{font-size:16px; font-weight:900; margin-bottom:14px;}
+.sheet label{font-size:11px; color:var(--muted); display:block; margin:11px 0 5px; font-weight:500;}
+.sheet input, .sheet select{width:100%; border:1px solid var(--line-strong); border-radius:9px; padding:10px 11px; font-family:inherit; font-size:13px; background:#fff;}
+.close-x{position:absolute; left:18px; top:16px; font-size:20px; color:var(--muted);}
+.tab-row{display:flex; gap:6px; margin-bottom:12px;}
+.tab-row button{flex:1; padding:9px 4px; border-radius:9px; border:1px solid var(--line-strong); background:#fff; font-family:inherit; font-size:11.5px; font-weight:500;}
+.tab-row button.active{background:var(--ink); color:var(--gold); border-color:var(--ink);}
+.admin-item{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;}
+.admin-item button{color:var(--danger); background:none; border:none; font-size:16px;}
+.toast{position:fixed; bottom:92px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--gold); padding:11px 20px; border-radius:24px; font-size:12.5px; z-index:200; opacity:0; transition:.25s; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,.3);}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= HOME ================= -->
+  <div class="screen active" id="screen-home">
+    <div class="topbar">
+      <div class="logo">
+        <svg viewBox="0 0 200 200"><rect width="200" height="200" rx="40" fill="#141311"/><path d="M40 150 L40 60 L70 60 L100 100 L130 60 L160 60 L160 150 L134 150 L134 95 L104 136 L96 136 L66 95 L66 150 Z" fill="#fff"/><path d="M112 40 L84 104 L102 104 L92 160 L142 88 L120 88 L134 40 Z" fill="#F2B705"/></svg>
+        <div><b>MAESTRO</b><span>FAST DELIVERY</span></div>
+      </div>
+      <div class="icons">
+        <i class="ti ti-bell"></i>
+        <div style="position:relative" onclick="go('screen-cart')">
+          <i class="ti ti-shopping-cart"></i>
+          <span class="badge" id="cartBadge" style="display:none">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="locbar">
+      <div class="row" id="locRow"><i class="ti ti-map-pin"></i> <span id="locLabel">لسه محددتش موقع التوصيل</span></div>
+      <input type="text" id="manualLoc" placeholder="اكتب عنوانك يدوي (الحي، الشارع، رقم العمارة)">
+      <div class="actions">
+        <button class="btn-sm gold" onclick="detectLocation()"><i class="ti ti-current-location"></i> تحديد تلقائي</button>
+        <button class="btn-sm" onclick="saveManualLoc()"><i class="ti ti-check"></i> حفظ العنوان</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="search"><i class="ti ti-search"></i><input placeholder="دور على مطعم أو صنف" id="searchInput" oninput="renderRestaurants()"></div>
+
+      <div class="ads" id="adsWrap"></div>
+
+      <div class="cats" id="catsWrap"></div>
+
+      <div class="sec-title">مطاعم ومحلات <span id="restCount">0</span></div>
+      <div id="restList"></div>
+    </div>
+
+    <div class="bottomnav">
+      <button class="navbtn active"><i class="ti ti-home"></i>الرئيسية</button>
+      <button class="navbtn"><i class="ti ti-heart"></i>المفضلة</button>
+      <button class="navbtn" onclick="go('screen-orders')"><i class="ti ti-receipt"></i>طلباتي</button>
+      <button class="navbtn"><i class="ti ti-user"></i>حسابي</button>
+    </div>
+  </div>
+
+  <!-- ================= MENU ================= -->
+  <div class="screen" id="screen-menu">
+    <div class="menu-header">
+      <div class="cover" id="menuCover"></div>
+      <div class="back" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i></div>
+      <div class="info">
+        <h2 id="menuName">-</h2>
+        <div class="meta" id="menuMeta"></div>
+      </div>
+    </div>
+    <div class="content" id="dishList" style="flex:1;"></div>
+    <div class="checkout-bar" id="menuCheckoutBar" style="display:none;">
+      <button class="btn-main" onclick="go('screen-cart')"><i class="ti ti-shopping-cart"></i> <span id="menuCartText">شاهد السلة</span></button>
+    </div>
+  </div>
+
+  <!-- ================= CART ================= -->
+  <div class="screen" id="screen-cart">
+    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> سلتك</div><div></div></div>
+    <div class="content">
+      <div id="cartWrap"></div>
+
+      <div class="sec-title" style="margin-top:20px;">اختار طريقة الدفع</div>
+      <div class="pay-opt" data-pay="cash" onclick="selectPay('cash')"><i class="ti ti-cash"></i><div class="t"><b>كاش عند الاستلام</b><small>تدفع نقدي للمندوب</small></div><div class="radio"></div></div>
+      <div class="pay-opt" data-pay="vodafone" onclick="selectPay('vodafone')"><i class="ti ti-device-mobile"></i><div class="t"><b>فودافون كاش</b><small>تحويل على رقم المحفظة</small></div><div class="radio"></div></div>
+      <div class="pay-opt" data-pay="instapay" onclick="selectPay('instapay')"><i class="ti ti-wallet"></i><div class="t"><b>InstaPay</b><small>تحويل فوري</small></div><div class="radio"></div></div>
+
+      <div id="walletBox" style="display:none;"></div>
+    </div>
+    <div class="checkout-bar">
+      <button class="btn-main" id="confirmBtn" disabled onclick="confirmOrder()"><i class="ti ti-check"></i> تأكيد الطلب</button>
+    </div>
+  </div>
+
+  <!-- ================= ORDERS / TRACKING ================= -->
+  <div class="screen" id="screen-orders">
+    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> تتبع الطلب</div><div></div></div>
+    <div class="content" style="padding:0; display:flex; flex-direction:column;" id="ordersContent">
+      <div class="empty-state" style="margin-top:40px;"><i class="ti ti-map-2"></i><p>مفيش طلب شغال دلوقتي</p></div>
+    </div>
+  </div>
+
+  <button class="admin-fab" onclick="openAdmin()"><i class="ti ti-settings"></i></button>
+
+  <!-- ADMIN SHEET -->
+  <div class="overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
+    <div class="sheet">
+      <div class="close-x" onclick="closeAdmin()"><i class="ti ti-x"></i></div>
+      <h3>لوحة الإضافة السريعة (تجريبي)</h3>
+      <div class="tab-row">
+        <button class="active" id="tabRestBtn" onclick="adminTab('rest')">مطعم</button>
+        <button id="tabDishBtn" onclick="adminTab('dish')">صنف</button>
+        <button id="tabAdBtn" onclick="adminTab('ad')">إعلان</button>
+        <button id="tabWalletBtn" onclick="adminTab('wallet')">أرقام الدفع</button>
+      </div>
+
+      <div id="tab-rest">
+        <label>اسم المطعم</label><input id="rName" placeholder="مثال: كشري التحرير">
+        <label>رابط صورة الغلاف (اختياري)</label><input id="rImg" placeholder="https://...">
+        <label>التصنيف</label><input id="rCat" placeholder="مطاعم / سوبر ماركت / صيدليات">
+        <label>وقت التوصيل التقريبي</label><input id="rTime" placeholder="20-30 دقيقة">
+        <button class="btn-main" style="margin-top:16px;" onclick="addRestaurant()">إضافة المطعم</button>
+      </div>
+
+      <div id="tab-dish" style="display:none;">
+        <label>اختار المطعم</label><select id="dRest"></select>
+        <label>اسم الصنف</label><input id="dName" placeholder="مثال: كشري وسط">
+        <label>السعر (جنيه)</label><input id="dPrice" type="number" placeholder="45">
+        <label>رابط صورة الصنف (اختياري)</label><input id="dImg" placeholder="https://...">
+        <button class="btn-main" style="margin-top:16px;" onclick="addDish()">إضافة الصنف</button>
+      </div>
+
+      <div id="tab-ad" style="display:none;">
+        <label>عنوان الإعلان</label><input id="aTitle" placeholder="خصم 20% على أول أوردر">
+        <label>وصف قصير</label><input id="aDesc" placeholder="على كل المطاعم لمدة 3 أيام">
+        <button class="btn-main" style="margin-top:16px;" onclick="addAd()">إضافة الإعلان</button>
+      </div>
+
+      <div id="tab-wallet" style="display:none;">
+        <label>رقم فودافون كاش</label><input id="wVodafone" placeholder="01xxxxxxxxx">
+        <label>رقم / معرف InstaPay</label><input id="wInstapay" placeholder="01xxxxxxxxx@instapay">
+        <button class="btn-main" style="margin-top:16px;" onclick="saveWallet()">حفظ الأرقام</button>
+      </div>
+
+      <div class="sec-title" style="margin-top:20px;">العناصر الحالية</div>
+      <div id="adminList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---------------- STATE (in-memory only — demo, no backend yet) ---------------- */
+let state = {
+  location: null,
+  restaurants: [],
+  ads: [],
+  wallet: { vodafone: '01000000000', instapay: '01000000000@instapay' },
+  cart: [],
+  payMethod: null,
+  proofFile: false,
+  activeCat: 'الكل'
+};
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='screen-cart') renderCart();
+}
+
+/* ---------------- LOCATION ---------------- */
+function detectLocation(){
+  if(!navigator.geolocation){ toast('المتصفح ده مش بيدعم تحديد الموقع'); return; }
+  toast('بنحدد موقعك...');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      state.location = {lat:pos.coords.latitude, lng:pos.coords.longitude, manual:false};
+      document.getElementById('locLabel').textContent = 'تم تحديد موقعك تلقائيًا ✓';
+      document.getElementById('locRow').classList.add('ok');
+      toast('تم تحديد الموقع بنجاح');
+    },
+    err=>{ toast('محتاجين إذن الوصول للموقع عشان نكمل الطلب'); }
+  );
+}
+function saveManualLoc(){
+  const v = document.getElementById('manualLoc').value.trim();
+  if(!v){ toast('اكتب العنوان الأول'); return; }
+  state.location = {address:v, manual:true};
+  document.getElementById('locLabel').textContent = 'العنوان: '+v;
+  document.getElementById('locRow').classList.add('ok');
+  toast('تم حفظ العنوان');
+}
+
+/* ---------------- RENDER HOME ---------------- */
+function renderAds(){
+  const wrap = document.getElementById('adsWrap');
+  if(state.ads.length===0){
+    wrap.innerHTML = `<div class="ad-empty">لا توجد إعلانات مضافة — أضِفها من لوحة الإدارة (⚙)</div>`;
+    return;
+  }
+  wrap.innerHTML = state.ads.map(a=>`
+    <div class="ad-card"><span class="tag">إعلان</span><h3>${a.title}</h3><p>${a.desc}</p></div>
+  `).join('');
+}
+
+function renderCats(){
+  const cats = ['الكل', ...new Set(state.restaurants.map(r=>r.cat).filter(Boolean))];
+  document.getElementById('catsWrap').innerHTML = cats.map(c=>
+    `<button class="chip ${c===state.activeCat?'active':''}" onclick="setCat('${c.replace(/'/g,"")}')">${c}</button>`
+  ).join('');
+}
+function setCat(c){ state.activeCat = c; renderCats(); renderRestaurants(); }
+
+function renderRestaurants(){
+  const q = (document.getElementById('searchInput').value||'').trim();
+  let list = state.restaurants;
+  if(state.activeCat && state.activeCat!=='الكل') list = list.filter(r=>r.cat===state.activeCat);
+  if(q) list = list.filter(r=>r.name.includes(q));
+  document.getElementById('restCount').textContent = list.length;
+  const el = document.getElementById('restList');
+  if(list.length===0){
+    el.innerHTML = `<div class="empty-state"><i class="ti ti-building-store"></i><p>لسه مفيش مطاعم متضافة.<br>اضغط على ⚙ تحت واضف أول مطعم.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="rest-grid">` + list.map(r=>`
+    <div class="rest-card" onclick="openMenu('${r.id}')">
+      <div class="thumb" style="background-image:url('${r.img||''}')"><span class="cat-tag">${r.cat||''}</span></div>
+      <div class="body">
+        <h4>${r.name}</h4>
+        <div class="meta"><i class="ti ti-clock"></i> ${r.time||'—'}</div>
+      </div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+/* ---------------- MENU SCREEN ---------------- */
+function openMenu(id){
+  const r = state.restaurants.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('menuCover').style.backgroundImage = r.img?`url(${r.img})`:'';
+  document.getElementById('menuName').textContent = r.name;
+  document.getElementById('menuMeta').innerHTML = `<i class="ti ti-tag"></i> ${r.cat||''} <span>&middot;</span> <i class="ti ti-clock"></i> ${r.time||'—'}`;
+  const list = document.getElementById('dishList');
+  if(r.dishes.length===0){
+    list.innerHTML = `<div class="empty-state"><i class="ti ti-tools-kitchen-2"></i><p>مفيش أصناف مضافة للمطعم ده لسه.<br>ضيفها من لوحة الإدارة ⚙</p></div>`;
+  } else {
+    list.innerHTML = r.dishes.map(d=>{
+      const qty = cartQty(r.id, d.id);
+      return `<div class="dish">
+        <div class="d-info"><h5>${d.name}</h5><div class="price">${d.price} ج.م</div></div>
+        <div class="qty-ctrl">
+          ${qty>0?`<button onclick="changeQty('${r.id}','${d.id}',-1)">−</button><span>${qty}</span>`:''}
+          <button class="add" onclick="changeQty('${r.id}','${d.id}',1,'${r.name.replace(/'/g,"")}','${d.name.replace(/'/g,"")}',${d.price})"><i class="ti ti-plus" style="font-size:13px"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  updateMenuCheckoutBar();
+  go('screen-menu');
+}
+function cartQty(restId, dishId){
+  const it = state.cart.find(c=>c.restId===restId && c.dishId===dishId);
+  return it ? it.qty : 0;
+}
+function changeQty(restId, dishId, delta, name, dname, price){
+  let it = state.cart.find(c=>c.restId===restId && c.dishId===dishId);
+  if(!it && delta>0){ it = {restId,dishId,name:dname,price,qty:0}; state.cart.push(it); }
+  if(it){ it.qty += delta; if(it.qty<=0) state.cart = state.cart.filter(c=>c!==it); }
+  openMenu(restId);
+  updateCartBadge();
+}
+function updateMenuCheckoutBar(){
+  const total = state.cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const bar = document.getElementById('menuCheckoutBar');
+  if(state.cart.length>0){
+    bar.style.display='block';
+    document.getElementById('menuCartText').textContent = `شاهد السلة · ${total} ج.م`;
+  } else bar.style.display='none';
+}
+function updateCartBadge(){
+  const count = state.cart.reduce((s,c)=>s+c.qty,0);
+  const b = document.getElementById('cartBadge');
+  if(count>0){ b.style.display='block'; b.textContent = count; } else b.style.display='none';
+  updateMenuCheckoutBar();
+}
+
+/* ---------------- CART / CHECKOUT (receipt-style ticket) ---------------- */
+function renderCart(){
+  const wrap = document.getElementById('cartWrap');
+  if(state.cart.length===0){
+    wrap.innerHTML = `<div class="empty-state"><i class="ti ti-shopping-cart-off"></i><p>السلة فاضية، اختار مطعم وابدأ اطلب</p></div>`;
+    document.getElementById('confirmBtn').disabled = true;
+    return;
+  }
+  const sub = state.cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const delivery = 15;
+  wrap.innerHTML = `
+    <div class="ticket">
+      <div class="ticket-head"><b>ملخص طلبك</b><span>#MST-${Date.now().toString().slice(-5)}</span></div>
+      ${state.cart.map(c=>`
+        <div class="tline"><span class="nm">${c.name} ×${c.qty}</span><span class="dots"></span><span class="pr">${c.price*c.qty}</span></div>
+      `).join('')}
+      <div class="totals">
+        <div class="total-row"><span>الإجمالي الفرعي</span><span class="pr mono">${sub} ج.م</span></div>
+        <div class="total-row"><span>رسوم التوصيل</span><span class="pr mono">${delivery} ج.م</span></div>
+        <div class="total-row grand"><span>الإجمالي</span><span class="pr">${sub+delivery} ج.م</span></div>
+      </div>
+    </div>
+  `;
+  validateConfirm();
+}
+function selectPay(m){
+  state.payMethod = m;
+  document.querySelectorAll('.pay-opt').forEach(el=>el.classList.toggle('selected', el.dataset.pay===m));
+  const box = document.getElementById('walletBox');
+  if(m==='cash'){ box.style.display='none'; }
+  else{
+    box.style.display='block';
+    const num = m==='vodafone'?state.wallet.vodafone:state.wallet.instapay;
+    const label = m==='vodafone'?'رقم فودافون كاش':'رقم / معرف InstaPay';
+    box.innerHTML = `
+      <div class="wallet-box">
+        <div class="lbl">حوّل قيمة الطلب على ${label}</div>
+        <div class="num">${num}</div>
+        <div class="lbl">بعد التحويل ارفع صورة إثبات (سكرين شوت) التحويل هنا</div>
+      </div>
+      <div class="upload" id="uploadBox">
+        <i class="ti ti-camera-plus" style="font-size:23px; display:block; margin-bottom:7px;"></i>
+        <span id="uploadLabel">اضغط لرفع سكرين شوت التحويل</span>
+        <input type="file" accept="image/*" onchange="onProof(this)">
+      </div>
+    `;
+  }
+  validateConfirm();
+}
+function onProof(input){
+  if(input.files && input.files[0]){
+    state.proofFile = true;
+    const box = document.getElementById('uploadBox');
+    box.classList.add('has-file');
+    document.getElementById('uploadLabel').textContent = '✓ تم إرفاق: '+input.files[0].name;
+  }
+  validateConfirm();
+}
+function validateConfirm(){
+  let ok = state.cart.length>0 && state.location && state.payMethod;
+  if(state.payMethod==='vodafone' || state.payMethod==='instapay') ok = ok && state.proofFile;
+  document.getElementById('confirmBtn').disabled = !ok;
+}
+function confirmOrder(){
+  if(!state.location){ toast('حدد موقع التوصيل الأول من الصفحة الرئيسية'); return; }
+  startTracking();
+  state.cart = []; state.payMethod=null; state.proofFile=false;
+  updateCartBadge();
+  go('screen-orders');
+  toast('تم تأكيد طلبك');
+}
+
+/* ---------------- TRACKING (simulated live map) ---------------- */
+function startTracking(){
+  const el = document.getElementById('ordersContent');
+  el.innerHTML = `
+    <div class="map-box">
+      <svg viewBox="0 0 400 220">
+        <path d="M30 190 C 100 60, 260 180, 370 40" stroke="#cfc7ac" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <circle cx="30" cy="190" r="7" fill="#141311"/>
+        <circle cx="370" cy="40" r="7" fill="#F2B705"/>
+        <circle id="driverDot" cx="30" cy="190" r="9" fill="#E8542A"/>
+      </svg>
+    </div>
+    <div class="status-steps" id="steps">
+      <div class="step done"><div class="dot"></div><span>المطعم استلم الطلب</span></div>
+      <div class="step" id="st2"><div class="dot"></div><span>جاري تحضير الطلب</span></div>
+      <div class="step" id="st3"><div class="dot"></div><span>المندوب في الطريق إليك</span></div>
+      <div class="step" id="st4"><div class="dot"></div><span>تم التوصيل</span></div>
+    </div>
+    <div class="driver-card">
+      <div class="av">م</div>
+      <div class="n"><b>مندوب التوصيل</b><small>هيوصلك خلال دقائق</small></div>
+      <i class="ti ti-phone"></i>
+    </div>
+  `;
+  animateDriver();
+  setTimeout(()=>setStep(2),1500);
+  setTimeout(()=>setStep(3),4000);
+  setTimeout(()=>setStep(4),9000);
+}
+function setStep(n){
+  document.querySelectorAll('#steps .step').forEach((s,i)=>{
+    s.classList.remove('now');
+    if(i < n-1) s.classList.add('done');
+    else if(i === n-1) s.classList.add('now');
+  });
+}
+function animateDriver(){
+  const dot = document.getElementById('driverDot');
+  const path = document.querySelector('.map-box path');
+  if(!dot||!path) return;
+  const len = path.getTotalLength();
+  const dur = 9000, start = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-start)/dur);
+    const p = path.getPointAtLength(t*len);
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ---------------- ADMIN QUICK-ADD (demo data entry) ---------------- */
+function openAdmin(){ document.getElementById('adminOverlay').classList.add('active'); refreshAdminSelectors(); renderAdminList(); }
+function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('active'); }
+function adminTab(tab){
+  ['rest','dish','ad','wallet'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
+    document.getElementById('tab'+t[0].toUpperCase()+t.slice(1)+'Btn').classList.toggle('active', t===tab);
+  });
+}
+function refreshAdminSelectors(){
+  const sel = document.getElementById('dRest');
+  sel.innerHTML = state.restaurants.map(r=>`<option value="${r.id}">${r.name}</option>`).join('') || '<option value="">لا يوجد مطاعم — ضيف مطعم الأول</option>';
+}
+function addRestaurant(){
+  const name = document.getElementById('rName').value.trim();
+  if(!name){ toast('اكتب اسم المطعم'); return; }
+  state.restaurants.push({
+    id: 'r'+Date.now(),
+    name,
+    img: document.getElementById('rImg').value.trim(),
+    cat: document.getElementById('rCat').value.trim() || 'مطاعم',
+    time: document.getElementById('rTime').value.trim(),
+    dishes: []
+  });
+  ['rName','rImg','rCat','rTime'].forEach(id=>document.getElementById(id).value='');
+  renderCats(); renderRestaurants(); refreshAdminSelectors(); renderAdminList();
+  toast('تمت إضافة المطعم');
+}
+function addDish(){
+  const restId = document.getElementById('dRest').value;
+  const name = document.getElementById('dName').value.trim();
+  const price = parseFloat(document.getElementById('dPrice').value);
+  if(!restId){ toast('ضيف مطعم الأول'); return; }
+  if(!name || !price){ toast('اكتب اسم الصنف والسعر'); return; }
+  const r = state.restaurants.find(x=>x.id===restId);
+  r.dishes.push({id:'d'+Date.now(), name, price, img: document.getElementById('dImg').value.trim()});
+  ['dName','dPrice','dImg'].forEach(id=>document.getElementById(id).value='');
+  renderAdminList();
+  toast('تمت إضافة الصنف');
+}
+function addAd(){
+  const title = document.getElementById('aTitle').value.trim();
+  const desc = document.getElementById('aDesc').value.trim();
+  if(!title){ toast('اكتب عنوان الإعلان'); return; }
+  state.ads.push({title, desc});
+  document.getElementById('aTitle').value=''; document.getElementById('aDesc').value='';
+  renderAds(); renderAdminList();
+  toast('تمت إضافة الإعلان');
+}
+function saveWallet(){
+  const v = document.getElementById('wVodafone').value.trim();
+  const i = document.getElementById('wInstapay').value.trim();
+  if(v) state.wallet.vodafone = v;
+  if(i) state.wallet.instapay = i;
+  toast('تم حفظ أرقام الدفع');
+}
+function renderAdminList(){
+  let html = '';
+  state.restaurants.forEach(r=>{
+    html += `<div class="admin-item"><span><i class="ti ti-building-store"></i> ${r.name} (${r.dishes.length} صنف)</span><button onclick="delRest('${r.id}')"><i class="ti ti-trash"></i></button></div>`;
+  });
+  document.getElementById('adminList').innerHTML = html || '<p style="color:var(--muted); font-size:12px;">لسه مفيش عناصر مضافة.</p>';
+}
+function delRest(id){
+  state.restaurants = state.restaurants.filter(r=>r.id!==id);
+  renderCats(); renderRestaurants(); refreshAdminSelectors(); renderAdminList();
+}
+
+/* ---------------- INIT ---------------- */
+renderAds(); renderCats(); renderRestaurants();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
