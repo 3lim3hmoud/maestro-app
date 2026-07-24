@@ -403,11 +403,20 @@ function toast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
-function go(id){
+function go(id, fromPop){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id==='screen-cart') renderCart();
+  if(!fromPop){
+    if(id==='screen-home') history.replaceState({screen:id}, '', '#'+id);
+    else history.pushState({screen:id}, '', '#'+id);
+  }
 }
+window.addEventListener('popstate', e=>{
+  const id = (e.state && e.state.screen) || 'screen-home';
+  go(id, true);
+});
+history.replaceState({screen:'screen-home'}, '', '#screen-home');
 
 /* ---------------- LOCATION ---------------- */
 function detectLocation(){
