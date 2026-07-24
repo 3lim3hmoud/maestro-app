@@ -263,7 +263,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
       <div id="walletBox" style="display:none;"></div>
     </div>
     <div class="checkout-bar">
-      <button class="btn-main" id="confirmBtn" disabled onclick="confirmOrder()"><i class="ti ti-check"></i> تأكيد الطلب</button>
+      <button class="btn-main" id="confirmBtn" onclick="confirmOrder()"><i class="ti ti-check"></i> تأكيد الطلب</button>
     </div>
   </div>
 
@@ -594,12 +594,13 @@ function onProof(input){
   validateConfirm();
 }
 function validateConfirm(){
-  let ok = state.cart.length>0 && state.location && state.payMethod;
-  if(state.payMethod==='vodafone' || state.payMethod==='instapay') ok = ok && state.proofFile;
-  document.getElementById('confirmBtn').disabled = !ok;
+  // no longer disables the button silently — confirmOrder() below gives a clear reason instead
 }
 function confirmOrder(){
-  if(!state.location){ toast('حدد موقع التوصيل الأول من الصفحة الرئيسية'); return; }
+  if(state.cart.length===0){ toast('السلة فاضية، ارجع اختار أصناف'); return; }
+  if(!state.location){ toast('حدد عنوان التوصيل من الصفحة الرئيسية الأول'); go('screen-home'); return; }
+  if(!state.payMethod){ toast('اختار طريقة الدفع تحت'); return; }
+  if((state.payMethod==='vodafone' || state.payMethod==='instapay') && !state.proofFile){ toast('ارفع سكرين شوت إثبات التحويل الأول'); return; }
   startTracking();
   state.cart = []; state.payMethod=null; state.proofFile=false;
   updateCartBadge();
