@@ -51,6 +51,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); min
 .pill.pending{background:#fdeee9; color:var(--bolt);}
 .pill.accepted{background:#fff6da; color:var(--gold-deep);}
 .pill.preparing{background:#fff6da; color:var(--gold-deep);}
+.pill.ready{background:#e7f0ff; color:#3a5da8;}
 .pill.on_the_way{background:#e8f1ec; color:var(--ok);}
 .pill.delivered{background:#e8f1ec; color:var(--ok);}
 .empty{text-align:center; padding:60px 20px; color:var(--muted);}
@@ -130,9 +131,9 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const PAY_LABELS = {cash:'كاش عند الاستلام', vodafone:'فودافون كاش', instapay:'إنستاباي'};
-const NEXT_STATUS = {accepted:'preparing', preparing:'on_the_way', on_the_way:'delivered'};
-const NEXT_LABEL = {accepted:'بدء التحضير', preparing:'المندوب طلع بالطلب', on_the_way:'تم التوصيل ✓'};
-const STATUS_LABEL = {pending:'طلب جديد', accepted:'مقبول', preparing:'بيتحضّر', on_the_way:'في الطريق', delivered:'تم التوصيل'};
+const NEXT_STATUS = {accepted:'preparing', preparing:'ready'};
+const NEXT_LABEL = {accepted:'بدء التحضير', preparing:'الطلب جاهز للاستلام'};
+const STATUS_LABEL = {pending:'طلب جديد', accepted:'مقبول', preparing:'بيتحضّر', ready:'جاهز للسواق', on_the_way:'مع السواق', delivered:'تم التوصيل'};
 
 let orders = {};
 let tab = 'pending';
@@ -160,7 +161,7 @@ function render(){
 
   let filtered = entries;
   if(tab==='pending') filtered = entries.filter(([,o])=>o.status==='pending');
-  else if(tab==='active') filtered = entries.filter(([,o])=>['accepted','preparing','on_the_way'].includes(o.status));
+  else if(tab==='active') filtered = entries.filter(([,o])=>['accepted','preparing','ready','on_the_way'].includes(o.status));
 
   if(filtered.length===0){
     list.innerHTML = `<div class="empty"><i class="ti ti-receipt-off"></i><p>مفيش طلبات هنا دلوقتي</p></div>`;

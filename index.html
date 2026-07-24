@@ -671,11 +671,21 @@ function confirmOrder(){
 }
 
 function listenOrderStatus(orderId){
-  db.ref('orders/'+orderId+'/status').on('value', snap=>{
-    const status = snap.val();
-    if(status==='accepted' || status==='preparing') setStep(2);
+  db.ref('orders/'+orderId).on('value', snap=>{
+    const o = snap.val();
+    if(!o) return;
+    const status = o.status;
+    if(status==='accepted' || status==='preparing' || status==='ready') setStep(2);
     else if(status==='on_the_way'){ setStep(3); animateDriver(); }
     else if(status==='delivered') setStep(4);
+    if(o.driverName){
+      const card = document.querySelector('.driver-card');
+      if(card){
+        card.querySelector('.n b').textContent = o.driverName;
+        card.querySelector('.n small').textContent = o.driverPhone ? o.driverPhone : 'هيوصلك خلال دقائق';
+        card.querySelector('.av').textContent = o.driverName.trim().charAt(0);
+      }
+    }
   });
 }
 
