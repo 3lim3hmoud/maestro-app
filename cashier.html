@@ -59,17 +59,21 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); min
 /* ---------- printable receipt (hidden on screen) ---------- */
 #receipt{display:none;}
 @media print{
-  body *{visibility:hidden;}
-  #receipt, #receipt *{visibility:visible;}
-  #receipt{display:block; position:absolute; top:0; right:0; width:80mm; padding:6mm; font-family:'JetBrains Mono',monospace; color:#000;}
-  .r-logo{text-align:center; font-weight:900; font-size:16px; letter-spacing:1px;}
+  @page{ size: 80mm auto; margin:0; }
+  html, body{ width:80mm; margin:0; padding:0; background:#fff; }
+  body > *:not(#receipt){ display:none !important; }
+  #receipt{
+    display:block !important; width:80mm; padding:3mm 4mm 6mm;
+    font-family:'JetBrains Mono',monospace; color:#000; background:#fff;
+  }
+  .r-logo{text-align:center; font-weight:900; font-size:17px; letter-spacing:1px;}
   .r-sub{text-align:center; font-size:9px; letter-spacing:2px; margin-bottom:6px;}
-  .r-rest{text-align:center; font-weight:900; font-size:13px; margin-bottom:2px;}
+  .r-rest{text-align:center; font-weight:900; font-size:14px; margin-bottom:2px;}
   .r-line{border-top:1px dashed #000; margin:6px 0;}
-  .r-row{display:flex; justify-content:space-between; font-size:11px; margin:2px 0;}
+  .r-row{display:flex; justify-content:space-between; font-size:11px; margin:2px 0; gap:8px;}
   .r-item{display:flex; justify-content:space-between; font-size:11px; margin:3px 0;}
-  .r-total{display:flex; justify-content:space-between; font-weight:900; font-size:13px; margin-top:6px;}
-  .r-foot{text-align:center; font-size:10px; margin-top:10px;}
+  .r-total{display:flex; justify-content:space-between; font-weight:900; font-size:14px; margin-top:6px;}
+  .r-foot{text-align:center; font-size:10px; margin-top:10px; line-height:1.6;}
 }
 </style>
 </head>
@@ -77,7 +81,10 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); min
 
 <div class="topbar">
   <div><b>كاشير — كشري أفندينا</b><span>MAESTRO PARTNER</span></div>
-  <div class="status" id="connStatus"><div class="dot"></div><span>بيتصل...</span></div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <button onclick="testPrint()" style="background:#1b1a15; color:var(--gold); border:1px solid #3a382f; border-radius:8px; padding:8px 12px; font-family:inherit; font-size:11px; font-weight:700; display:flex; align-items:center; gap:6px;"><i class="ti ti-printer"></i> طباعة تجريبية</button>
+    <div class="status" id="connStatus"><div class="dot"></div><span>بيتصل...</span></div>
+  </div>
 </div>
 
 <div class="wrap">
@@ -196,6 +203,20 @@ function acceptOrder(id){
 }
 function advanceOrder(id, next){
   db.ref('orders/'+id+'/status').set(next);
+}
+
+function testPrint(){
+  document.getElementById('rc-rest').textContent = 'كشري أفندينا';
+  document.getElementById('rc-id').textContent = '#TEST01';
+  document.getElementById('rc-date').textContent = new Date().toLocaleString('ar-EG');
+  document.getElementById('rc-phone').textContent = '01000000000';
+  document.getElementById('rc-addr').textContent = 'طباعة تجريبية — ضبط الطابعة';
+  document.getElementById('rc-items').innerHTML = `<div class="r-item"><span>كشري أفندينا ×1</span><span>25 ج.م</span></div>`;
+  document.getElementById('rc-sub').textContent = '25 ج.م';
+  document.getElementById('rc-del').textContent = '15 ج.م';
+  document.getElementById('rc-total').textContent = '40 ج.م';
+  document.getElementById('rc-pay').textContent = 'كاش عند الاستلام';
+  window.print();
 }
 
 function printReceipt(id){

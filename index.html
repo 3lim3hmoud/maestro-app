@@ -230,7 +230,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
   <div class="screen" id="screen-menu">
     <div class="menu-header">
       <div class="cover" id="menuCover"></div>
-      <div class="back" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i></div>
+      <div class="back" onclick="goBack()"><i class="ti ti-arrow-right"></i></div>
       <div class="info">
         <h2 id="menuName">-</h2>
         <div class="meta" id="menuMeta"></div>
@@ -244,7 +244,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= CART ================= -->
   <div class="screen" id="screen-cart">
-    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> سلتك</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> سلتك</div><div></div></div>
     <div class="content">
       <div id="cartWrap"></div>
 
@@ -275,7 +275,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= ORDERS / TRACKING ================= -->
   <div class="screen" id="screen-orders">
-    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> تتبع الطلب</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> تتبع الطلب</div><div></div></div>
     <div class="content" style="padding:0; display:flex; flex-direction:column;" id="ordersContent">
       <div class="empty-state" style="margin-top:40px;"><i class="ti ti-map-2"></i><p>مفيش طلب شغال دلوقتي</p></div>
     </div>
@@ -283,7 +283,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= FAVORITES ================= -->
   <div class="screen" id="screen-fav">
-    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> المفضلة</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> المفضلة</div><div></div></div>
     <div class="content"><div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div></div>
     <div class="bottomnav">
       <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
@@ -295,7 +295,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= ACCOUNT ================= -->
   <div class="screen" id="screen-account">
-    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> حسابي</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> حسابي</div><div></div></div>
     <div class="content">
       <div class="ticket" style="margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -430,6 +430,13 @@ function go(id, fromPop){
   if(!fromPop){
     if(id==='screen-home') history.replaceState({screen:id}, '', '#'+id);
     else history.pushState({screen:id}, '', '#'+id);
+  }
+}
+function goBack(){
+  if(history.state && history.state.screen && history.state.screen!=='screen-home'){
+    history.back();
+  } else {
+    go('screen-home');
   }
 }
 window.addEventListener('popstate', e=>{
