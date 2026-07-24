@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كاشير كشري أفندينا — Maestro</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{
+  --ink:#141311; --ink2:#242219; --paper:#FBF9F4; --panel:#F2EEE3;
+  --gold:#F2B705; --gold-deep:#8a5c00; --bolt:#E8542A;
+  --line:#E4DFCF; --line-strong:#d7d0ba; --muted:#8c8672;
+  --danger:#c1443c; --ok:#3f7a52;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); min-height:100vh;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.topbar{background:var(--ink); color:#fff; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid var(--gold); position:sticky; top:0; z-index:10;}
+.topbar b{font-size:17px; font-weight:900;}
+.topbar span{font-size:10px; color:var(--gold); letter-spacing:2px; font-family:'JetBrains Mono',monospace; display:block; margin-top:2px;}
+.topbar .status{font-size:11px; padding:6px 12px; border-radius:20px; background:#1b1a15; color:#8a8574; font-weight:700; display:flex; align-items:center; gap:6px;}
+.topbar .status.live{color:var(--ok);}
+.topbar .status .dot{width:7px; height:7px; border-radius:50%; background:currentColor;}
+
+.wrap{max-width:640px; margin:0 auto; padding:16px;}
+.tabs{display:flex; gap:8px; margin-bottom:16px;}
+.tabs button{flex:1; padding:11px; border-radius:10px; border:1px solid var(--line-strong); background:#fff; font-family:inherit; font-weight:700; font-size:13px; color:var(--ink2);}
+.tabs button.active{background:var(--ink); color:var(--gold); border-color:var(--ink);}
+
+.order-card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; position:relative; overflow:hidden;}
+.order-card.pending{border-color:var(--bolt); box-shadow:0 0 0 2px rgba(232,84,42,.12);}
+.order-card .badge-new{position:absolute; top:0; left:0; background:var(--bolt); color:#fff; font-size:10px; font-weight:900; padding:5px 12px; border-radius:0 0 10px 0;}
+.o-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; padding-bottom:10px; border-bottom:2px dashed var(--line-strong);}
+.o-head b{font-size:14px; font-weight:900;}
+.o-head span{font-size:10.5px; color:var(--muted); font-family:'JetBrains Mono',monospace;}
+.o-meta{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; font-size:12px; color:var(--ink2);}
+.o-meta div{display:flex; align-items:center; gap:5px;}
+.o-meta i{color:var(--gold-deep);}
+.o-items{margin-bottom:10px;}
+.o-line{display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; border-bottom:1px solid var(--line);}
+.o-total{display:flex; justify-content:space-between; font-weight:900; font-size:14px; padding-top:8px;}
+.o-actions{display:flex; gap:8px; margin-top:12px;}
+.o-actions button{flex:1; padding:11px; border-radius:10px; border:none; font-family:inherit; font-weight:900; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px;}
+.btn-accept{background:var(--gold); color:var(--ink);}
+.btn-next{background:var(--ink); color:var(--gold);}
+.btn-print{background:#fff; color:var(--ink); border:1.5px solid var(--line-strong) !important;}
+.pill{font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; display:inline-block;}
+.pill.pending{background:#fdeee9; color:var(--bolt);}
+.pill.accepted{background:#fff6da; color:var(--gold-deep);}
+.pill.preparing{background:#fff6da; color:var(--gold-deep);}
+.pill.on_the_way{background:#e8f1ec; color:var(--ok);}
+.pill.delivered{background:#e8f1ec; color:var(--ok);}
+.empty{text-align:center; padding:60px 20px; color:var(--muted);}
+.empty i{font-size:40px; display:block; margin-bottom:12px; color:var(--line-strong);}
+
+/* ---------- printable receipt (hidden on screen) ---------- */
+#receipt{display:none;}
+@media print{
+  body *{visibility:hidden;}
+  #receipt, #receipt *{visibility:visible;}
+  #receipt{display:block; position:absolute; top:0; right:0; width:80mm; padding:6mm; font-family:'JetBrains Mono',monospace; color:#000;}
+  .r-logo{text-align:center; font-weight:900; font-size:16px; letter-spacing:1px;}
+  .r-sub{text-align:center; font-size:9px; letter-spacing:2px; margin-bottom:6px;}
+  .r-rest{text-align:center; font-weight:900; font-size:13px; margin-bottom:2px;}
+  .r-line{border-top:1px dashed #000; margin:6px 0;}
+  .r-row{display:flex; justify-content:space-between; font-size:11px; margin:2px 0;}
+  .r-item{display:flex; justify-content:space-between; font-size:11px; margin:3px 0;}
+  .r-total{display:flex; justify-content:space-between; font-weight:900; font-size:13px; margin-top:6px;}
+  .r-foot{text-align:center; font-size:10px; margin-top:10px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div><b>كاشير — كشري أفندينا</b><span>MAESTRO PARTNER</span></div>
+  <div class="status" id="connStatus"><div class="dot"></div><span>بيتصل...</span></div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="active" id="tabPendingBtn" onclick="setTab('pending')">طلبات جديدة <span id="cntPending" class="mono"></span></button>
+    <button id="tabActiveBtn" onclick="setTab('active')">قيد التنفيذ</button>
+    <button id="tabAllBtn" onclick="setTab('all')">كل الطلبات</button>
+  </div>
+  <div id="ordersList"></div>
+</div>
+
+<!-- hidden printable receipt, filled right before window.print() -->
+<div id="receipt">
+  <div class="r-logo">MAESTRO</div>
+  <div class="r-sub">FAST DELIVERY</div>
+  <div class="r-rest" id="rc-rest">—</div>
+  <div class="r-line"></div>
+  <div class="r-row"><span>رقم الطلب</span><span id="rc-id">—</span></div>
+  <div class="r-row"><span>التاريخ</span><span id="rc-date">—</span></div>
+  <div class="r-row"><span>الهاتف</span><span id="rc-phone">—</span></div>
+  <div class="r-row" style="align-items:flex-start;"><span>العنوان</span><span id="rc-addr" style="max-width:55%; text-align:left;">—</span></div>
+  <div class="r-line"></div>
+  <div id="rc-items"></div>
+  <div class="r-line"></div>
+  <div class="r-row"><span>الإجمالي الفرعي</span><span id="rc-sub">—</span></div>
+  <div class="r-row"><span>رسوم التوصيل</span><span id="rc-del">—</span></div>
+  <div class="r-total"><span>الإجمالي</span><span id="rc-total">—</span></div>
+  <div class="r-row" style="margin-top:6px;"><span>طريقة الدفع</span><span id="rc-pay">—</span></div>
+  <div class="r-foot">شكرًا لطلبك من كشري أفندينا 🙏<br>بواسطة منصة Maestro</div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC2gMvHUG9j7hacZPvatn_3sThusofnW34",
+  authDomain: "maestro-afandina.firebaseapp.com",
+  databaseURL: "https://maestro-afandina-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "maestro-afandina",
+  storageBucket: "maestro-afandina.firebasestorage.app",
+  messagingSenderId: "682889796766",
+  appId: "1:682889796766:web:23be439b383f5a29bd2f8f"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const PAY_LABELS = {cash:'كاش عند الاستلام', vodafone:'فودافون كاش', instapay:'إنستاباي'};
+const NEXT_STATUS = {accepted:'preparing', preparing:'on_the_way', on_the_way:'delivered'};
+const NEXT_LABEL = {accepted:'بدء التحضير', preparing:'المندوب طلع بالطلب', on_the_way:'تم التوصيل ✓'};
+const STATUS_LABEL = {pending:'طلب جديد', accepted:'مقبول', preparing:'بيتحضّر', on_the_way:'في الطريق', delivered:'تم التوصيل'};
+
+let orders = {};
+let tab = 'pending';
+
+db.ref('orders').on('value', snap=>{
+  orders = snap.val() || {};
+  document.getElementById('connStatus').className='status live';
+  document.getElementById('connStatus').innerHTML='<div class="dot"></div><span>متصل لحظيًا</span>';
+  render();
+}, err=>{
+  document.getElementById('connStatus').innerHTML='<div class="dot"></div><span>في مشكلة اتصال</span>';
+});
+
+function setTab(t){
+  tab = t;
+  ['Pending','Active','All'].forEach(x=>document.getElementById('tab'+x+'Btn').classList.toggle('active', x.toLowerCase()===t));
+  render();
+}
+
+function render(){
+  const list = document.getElementById('ordersList');
+  const entries = Object.entries(orders).sort((a,b)=>b[1].createdAt-a[1].createdAt);
+  const pendingCount = entries.filter(([,o])=>o.status==='pending').length;
+  document.getElementById('cntPending').textContent = pendingCount>0?'('+pendingCount+')':'';
+
+  let filtered = entries;
+  if(tab==='pending') filtered = entries.filter(([,o])=>o.status==='pending');
+  else if(tab==='active') filtered = entries.filter(([,o])=>['accepted','preparing','on_the_way'].includes(o.status));
+
+  if(filtered.length===0){
+    list.innerHTML = `<div class="empty"><i class="ti ti-receipt-off"></i><p>مفيش طلبات هنا دلوقتي</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(([id,o])=>{
+    const itemsHtml = (o.items||[]).map(it=>`<div class="o-line"><span>${it.name} ×${it.qty}</span><span class="mono">${it.price*it.qty} ج.م</span></div>`).join('');
+    let actions = '';
+    if(o.status==='pending'){
+      actions = `<button class="btn-accept" onclick="acceptOrder('${id}')"><i class="ti ti-check"></i> قبول الطلب وطباعة الريسيت</button>`;
+    } else if(NEXT_STATUS[o.status]){
+      actions = `<button class="btn-next" onclick="advanceOrder('${id}','${NEXT_STATUS[o.status]}')"><i class="ti ti-arrow-left"></i> ${NEXT_LABEL[o.status]}</button>
+                 <button class="btn-print" onclick="printReceipt('${id}')"><i class="ti ti-printer"></i></button>`;
+    } else {
+      actions = `<button class="btn-print" onclick="printReceipt('${id}')"><i class="ti ti-printer"></i> إعادة طباعة</button>`;
+    }
+    return `<div class="order-card ${o.status==='pending'?'pending':''}">
+      ${o.status==='pending'?'<div class="badge-new">جديد</div>':''}
+      <div class="o-head">
+        <b>#${id.slice(-6).toUpperCase()}</b>
+        <span>${new Date(o.createdAt).toLocaleString('ar-EG')}</span>
+      </div>
+      <div class="o-meta">
+        <div><i class="ti ti-phone"></i> ${o.phone||'—'}</div>
+        <div><i class="ti ti-map-pin"></i> ${o.address||'—'}</div>
+        <div><span class="pill ${o.status}">${STATUS_LABEL[o.status]||o.status}</span></div>
+      </div>
+      <div class="o-items">${itemsHtml}</div>
+      <div class="o-total"><span>الإجمالي (${PAY_LABELS[o.payMethod]||o.payMethod})</span><span class="mono">${o.total} ج.م</span></div>
+      <div class="o-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+
+function acceptOrder(id){
+  db.ref('orders/'+id+'/status').set('accepted').then(()=>{
+    printReceipt(id);
+  });
+}
+function advanceOrder(id, next){
+  db.ref('orders/'+id+'/status').set(next);
+}
+
+function printReceipt(id){
+  const o = orders[id];
+  if(!o) return;
+  document.getElementById('rc-rest').textContent = o.restaurant || 'كشري أفندينا';
+  document.getElementById('rc-id').textContent = '#'+id.slice(-6).toUpperCase();
+  document.getElementById('rc-date').textContent = new Date(o.createdAt).toLocaleString('ar-EG');
+  document.getElementById('rc-phone').textContent = o.phone || '—';
+  document.getElementById('rc-addr').textContent = o.address || '—';
+  document.getElementById('rc-items').innerHTML = (o.items||[]).map(it=>
+    `<div class="r-item"><span>${it.name} ×${it.qty}</span><span>${it.price*it.qty} ج.م</span></div>`
+  ).join('');
+  document.getElementById('rc-sub').textContent = o.subtotal+' ج.م';
+  document.getElementById('rc-del').textContent = o.deliveryFee+' ج.م';
+  document.getElementById('rc-total').textContent = o.total+' ج.م';
+  document.getElementById('rc-pay').textContent = PAY_LABELS[o.payMethod] || o.payMethod;
+  window.print();
+}
+</script>
+</body>
+</html>
