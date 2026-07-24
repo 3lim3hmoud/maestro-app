@@ -101,7 +101,9 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 .menu-header .info h2{font-size:18px; font-weight:900;}
 .menu-header .info .meta{font-size:11.5px; color:var(--muted); margin-top:5px; display:flex; gap:10px; align-items:center;}
 .menu-header .info .meta i{color:var(--gold-deep);}
-.dish{display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line);}
+.dish{display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line); gap:10px;}
+.dish .d-thumb{width:52px; height:52px; border-radius:10px; background:var(--panel); background-size:cover; background-position:center; flex-shrink:0;}
+.dish .d-info{flex:1; min-width:0;}
 .dish .d-info h5{font-size:13.5px; font-weight:700; margin-bottom:4px;}
 .dish .d-info .price{font-size:12.5px; color:var(--gold-deep); font-weight:700; font-family:'JetBrains Mono',monospace;}
 .qty-ctrl{display:flex; align-items:center; gap:9px;}
@@ -372,8 +374,23 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 /* ---------------- STATE (in-memory only — demo, no backend yet) ---------------- */
 let state = {
   location: null,
-  restaurants: [],
-  ads: [],
+  restaurants: [
+    {
+      id: 'koshary-afandina',
+      name: 'كشري أفندينا',
+      img: './images/koshary-afandina/cover.png',
+      cat: 'كشري',
+      time: '20-30 دقيقة',
+      dishes: [
+        { id: 'ka-1', name: 'كشري أفندينا', price: 25, img: './images/koshary-afandina/dish-afandina.png' },
+        { id: 'ka-2', name: 'كشري لوكس', price: 35, img: './images/koshary-afandina/dish-lux.png' },
+        { id: 'ka-3', name: 'كشري ممتاز', price: 45, img: './images/koshary-afandina/dish-momtaz.png' }
+      ]
+    }
+  ],
+  ads: [
+    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png' }
+  ],
   wallet: { vodafone: '01000000000', instapay: '01000000000@instapay' },
   cart: [],
   payMethod: null,
@@ -471,6 +488,7 @@ function openMenu(id){
     list.innerHTML = r.dishes.map(d=>{
       const qty = cartQty(r.id, d.id);
       return `<div class="dish">
+        <div class="d-thumb" style="background-image:url('${d.img||''}')"></div>
         <div class="d-info"><h5>${d.name}</h5><div class="price">${d.price} ج.م</div></div>
         <div class="qty-ctrl">
           ${qty>0?`<button onclick="changeQty('${r.id}','${d.id}',-1)">−</button><span>${qty}</span>`:''}
