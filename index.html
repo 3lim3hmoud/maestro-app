@@ -55,11 +55,13 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 /* ---------- ads ---------- */
 .ads{display:flex; gap:10px; overflow-x:auto; margin-bottom:18px; padding-bottom:2px;}
 .ads::-webkit-scrollbar{display:none;}
-.ad-card{min-width:90%; background:var(--ink); border-radius:16px; padding:20px; color:#fff; position:relative; overflow:hidden; flex-shrink:0; border:1px solid #2a2820;}
-.ad-card::after{content:''; position:absolute; left:-20px; bottom:-30px; width:110px; height:110px; background:var(--gold); opacity:.12; border-radius:50%;}
-.ad-card .tag{background:var(--gold); color:var(--ink); font-size:10px; font-weight:700; padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:10px; letter-spacing:.3px;}
-.ad-card h3{font-size:17px; font-weight:900; margin-bottom:5px;}
-.ad-card p{font-size:11.5px; color:#b8b3a0;}
+.ad-card{min-width:90%; height:130px; background:var(--ink); background-size:cover; background-position:center; border-radius:16px; padding:18px; color:#fff; position:relative; overflow:hidden; flex-shrink:0; border:1px solid #2a2820; display:flex; flex-direction:column; justify-content:flex-end;}
+.ad-card::before{content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,9,7,.88) 0%, rgba(10,9,7,.35) 55%, rgba(10,9,7,.15) 100%);}
+.ad-card::after{content:''; position:absolute; left:-20px; top:-30px; width:110px; height:110px; background:var(--gold); opacity:.1; border-radius:50%;}
+.ad-card .tag, .ad-card h3, .ad-card p{position:relative; z-index:1;}
+.ad-card .tag{background:var(--gold); color:var(--ink); font-size:10px; font-weight:700; padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:8px; letter-spacing:.3px; width:fit-content;}
+.ad-card h3{font-size:16px; font-weight:900; margin-bottom:4px;}
+.ad-card p{font-size:11.5px; color:#d8d3c2;}
 .ad-empty{border:1.5px dashed var(--line-strong); border-radius:16px; padding:20px; text-align:center; color:var(--muted); font-size:12px; width:100%;}
 
 /* ---------- categories ---------- */
@@ -173,6 +175,11 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 .tab-row button.active{background:var(--ink); color:var(--gold); border-color:var(--ink);}
 .admin-item{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;}
 .admin-item button{color:var(--danger); background:none; border:none; font-size:16px;}
+.img-pick{border:1.5px dashed var(--line-strong); border-radius:10px; padding:12px; text-align:center; color:var(--muted); font-size:11.5px; position:relative; background:#fff; overflow:hidden;}
+.img-pick input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+.img-pick.has-img{padding:0; border-style:solid; height:90px; display:flex; align-items:center; justify-content:center;}
+.img-pick.has-img img{width:100%; height:100%; object-fit:cover;}
+.or-sep{text-align:center; font-size:10px; color:var(--muted); margin:6px 0;}
 .toast{position:fixed; bottom:92px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--gold); padding:11px 20px; border-radius:24px; font-size:12.5px; z-index:200; opacity:0; transition:.25s; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,.3);}
 .toast.show{opacity:1;}
 </style>
@@ -218,9 +225,9 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
     <div class="bottomnav">
       <button class="navbtn active"><i class="ti ti-home"></i>الرئيسية</button>
-      <button class="navbtn"><i class="ti ti-heart"></i>المفضلة</button>
+      <button class="navbtn" onclick="go('screen-fav')"><i class="ti ti-heart"></i>المفضلة</button>
       <button class="navbtn" onclick="go('screen-orders')"><i class="ti ti-receipt"></i>طلباتي</button>
-      <button class="navbtn"><i class="ti ti-user"></i>حسابي</button>
+      <button class="navbtn" onclick="go('screen-account')"><i class="ti ti-user"></i>حسابي</button>
     </div>
   </div>
 
@@ -266,6 +273,41 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
     </div>
   </div>
 
+  <!-- ================= FAVORITES ================= -->
+  <div class="screen" id="screen-fav">
+    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> المفضلة</div><div></div></div>
+    <div class="content"><div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div></div>
+    <div class="bottomnav">
+      <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
+      <button class="navbtn active"><i class="ti ti-heart"></i>المفضلة</button>
+      <button class="navbtn" onclick="go('screen-orders')"><i class="ti ti-receipt"></i>طلباتي</button>
+      <button class="navbtn" onclick="go('screen-account')"><i class="ti ti-user"></i>حسابي</button>
+    </div>
+  </div>
+
+  <!-- ================= ACCOUNT ================= -->
+  <div class="screen" id="screen-account">
+    <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> حسابي</div><div></div></div>
+    <div class="content">
+      <div class="ticket" style="margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:48px; height:48px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:900;">ع</div>
+          <div><b style="display:block; font-size:14px;">عميل ماسترو</b><span style="font-size:11px; color:var(--muted);">أضف بياناتك بعد ربط الحساب بالسيرفر</span></div>
+        </div>
+      </div>
+      <div class="admin-item"><span><i class="ti ti-map-pin"></i> عناويني المحفوظة</span><i class="ti ti-chevron-left"></i></div>
+      <div class="admin-item"><span><i class="ti ti-receipt"></i> طلباتي السابقة</span><i class="ti ti-chevron-left"></i></div>
+      <div class="admin-item"><span><i class="ti ti-headset"></i> تواصل مع الدعم</span><i class="ti ti-chevron-left"></i></div>
+      <div class="admin-item"><span><i class="ti ti-info-circle"></i> عن ماسترو</span><i class="ti ti-chevron-left"></i></div>
+    </div>
+    <div class="bottomnav">
+      <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
+      <button class="navbtn" onclick="go('screen-fav')"><i class="ti ti-heart"></i>المفضلة</button>
+      <button class="navbtn" onclick="go('screen-orders')"><i class="ti ti-receipt"></i>طلباتي</button>
+      <button class="navbtn active"><i class="ti ti-user"></i>حسابي</button>
+    </div>
+  </div>
+
   <button class="admin-fab" onclick="openAdmin()"><i class="ti ti-settings"></i></button>
 
   <!-- ADMIN SHEET -->
@@ -282,7 +324,10 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
       <div id="tab-rest">
         <label>اسم المطعم</label><input id="rName" placeholder="مثال: كشري التحرير">
-        <label>رابط صورة الغلاف (اختياري)</label><input id="rImg" placeholder="https://...">
+        <label>صورة الغلاف</label>
+        <div class="img-pick" id="rImgPick"><span>اضغط لرفع صورة من جهازك</span><input type="file" accept="image/*" onchange="pickImg(this,'rImgPick','rImg')"></div>
+        <div class="or-sep">أو الصق رابط صورة</div>
+        <input id="rImg" placeholder="https://...">
         <label>التصنيف</label><input id="rCat" placeholder="مطاعم / سوبر ماركت / صيدليات">
         <label>وقت التوصيل التقريبي</label><input id="rTime" placeholder="20-30 دقيقة">
         <button class="btn-main" style="margin-top:16px;" onclick="addRestaurant()">إضافة المطعم</button>
@@ -292,13 +337,20 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
         <label>اختار المطعم</label><select id="dRest"></select>
         <label>اسم الصنف</label><input id="dName" placeholder="مثال: كشري وسط">
         <label>السعر (جنيه)</label><input id="dPrice" type="number" placeholder="45">
-        <label>رابط صورة الصنف (اختياري)</label><input id="dImg" placeholder="https://...">
+        <label>صورة الصنف</label>
+        <div class="img-pick" id="dImgPick"><span>اضغط لرفع صورة من جهازك</span><input type="file" accept="image/*" onchange="pickImg(this,'dImgPick','dImg')"></div>
+        <div class="or-sep">أو الصق رابط صورة</div>
+        <input id="dImg" placeholder="https://...">
         <button class="btn-main" style="margin-top:16px;" onclick="addDish()">إضافة الصنف</button>
       </div>
 
       <div id="tab-ad" style="display:none;">
         <label>عنوان الإعلان</label><input id="aTitle" placeholder="خصم 20% على أول أوردر">
         <label>وصف قصير</label><input id="aDesc" placeholder="على كل المطاعم لمدة 3 أيام">
+        <label>صورة الإعلان</label>
+        <div class="img-pick" id="aImgPick"><span>اضغط لرفع صورة من جهازك</span><input type="file" accept="image/*" onchange="pickImg(this,'aImgPick','aImg')"></div>
+        <div class="or-sep">أو الصق رابط صورة</div>
+        <input id="aImg" placeholder="https://...">
         <button class="btn-main" style="margin-top:16px;" onclick="addAd()">إضافة الإعلان</button>
       </div>
 
@@ -371,7 +423,7 @@ function renderAds(){
     return;
   }
   wrap.innerHTML = state.ads.map(a=>`
-    <div class="ad-card"><span class="tag">إعلان</span><h3>${a.title}</h3><p>${a.desc}</p></div>
+    <div class="ad-card" style="background-image:url('${a.img||''}')"><span class="tag">إعلان</span><h3>${a.title}</h3><p>${a.desc}</p></div>
   `).join('');
 }
 
@@ -579,6 +631,26 @@ function animateDriver(){
   requestAnimationFrame(step);
 }
 
+/* ---------------- IMAGE UPLOAD HELPER ---------------- */
+function pickImg(input, pickId, hiddenInputId){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const dataUrl = e.target.result;
+    document.getElementById(hiddenInputId).value = dataUrl;
+    const pick = document.getElementById(pickId);
+    pick.classList.add('has-img');
+    pick.innerHTML = `<img src="${dataUrl}"><input type="file" accept="image/*" onchange="pickImg(this,'${pickId}','${hiddenInputId}')">`;
+  };
+  reader.readAsDataURL(file);
+}
+function resetImgPick(pickId, label){
+  const pick = document.getElementById(pickId);
+  pick.classList.remove('has-img');
+  pick.innerHTML = `<span>${label}</span><input type="file" accept="image/*" onchange="pickImg(this,'${pickId}','${pickId.replace('Pick','')}')">`;
+}
+
 /* ---------------- ADMIN QUICK-ADD (demo data entry) ---------------- */
 function openAdmin(){ document.getElementById('adminOverlay').classList.add('active'); refreshAdminSelectors(); renderAdminList(); }
 function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('active'); }
@@ -604,6 +676,7 @@ function addRestaurant(){
     dishes: []
   });
   ['rName','rImg','rCat','rTime'].forEach(id=>document.getElementById(id).value='');
+  resetImgPick('rImgPick','اضغط لرفع صورة من جهازك');
   renderCats(); renderRestaurants(); refreshAdminSelectors(); renderAdminList();
   toast('تمت إضافة المطعم');
 }
@@ -616,15 +689,18 @@ function addDish(){
   const r = state.restaurants.find(x=>x.id===restId);
   r.dishes.push({id:'d'+Date.now(), name, price, img: document.getElementById('dImg').value.trim()});
   ['dName','dPrice','dImg'].forEach(id=>document.getElementById(id).value='');
+  resetImgPick('dImgPick','اضغط لرفع صورة من جهازك');
   renderAdminList();
   toast('تمت إضافة الصنف');
 }
 function addAd(){
   const title = document.getElementById('aTitle').value.trim();
   const desc = document.getElementById('aDesc').value.trim();
+  const img = document.getElementById('aImg').value.trim();
   if(!title){ toast('اكتب عنوان الإعلان'); return; }
-  state.ads.push({title, desc});
-  document.getElementById('aTitle').value=''; document.getElementById('aDesc').value='';
+  state.ads.push({title, desc, img});
+  document.getElementById('aTitle').value=''; document.getElementById('aDesc').value=''; document.getElementById('aImg').value='';
+  resetImgPick('aImgPick','اضغط لرفع صورة من جهازك');
   renderAds(); renderAdminList();
   toast('تمت إضافة الإعلان');
 }
