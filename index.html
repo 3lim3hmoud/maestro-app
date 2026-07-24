@@ -440,7 +440,7 @@ history.replaceState({screen:'screen-home'}, '', '#screen-home');
 
 /* ---------------- LOCATION ---------------- */
 function detectLocation(){
-  if(!navigator.geolocation){ toast('المتصفح ده مش بيدعم تحديد الموقع'); return; }
+  if(!navigator.geolocation){ toast('المتصفح ده مش بيدعم تحديد الموقع، اكتب عنوانك يدوي'); return; }
   toast('بنحدد موقعك...');
   navigator.geolocation.getCurrentPosition(
     pos=>{
@@ -449,7 +449,14 @@ function detectLocation(){
       document.getElementById('locRow').classList.add('ok');
       toast('تم تحديد الموقع بنجاح');
     },
-    err=>{ toast('محتاجين إذن الوصول للموقع عشان نكمل الطلب'); }
+    err=>{
+      let msg = 'حصلت مشكلة في تحديد الموقع، اكتب عنوانك يدوي بدل كده';
+      if(err.code===1) msg = 'رفضت إذن الموقع للمتصفح — من إعدادات المتصفح فعّل إذن الموقع، أو اكتب عنوانك يدوي';
+      else if(err.code===2) msg = 'مش قادر يوصل لموقعك (GPS مقفول) — اكتب عنوانك يدوي';
+      else if(err.code===3) msg = 'الاتصال بطيء ومقدرش يحدد موقعك — اكتب عنوانك يدوي';
+      toast(msg);
+    },
+    {enableHighAccuracy:true, timeout:10000}
   );
 }
 function saveManualLoc(){
@@ -650,8 +657,9 @@ function confirmOrder(){
     updateCartBadge();
     go('screen-orders');
     toast('تم إرسال طلبك للمطعم');
-  }).catch(()=>{
-    toast('في مشكلة في إرسال الطلب، جرب تاني');
+  }).catch((err)=>{
+    console.error('Order send failed:', err);
+    toast('فشل الإرسال: '+(err.message||'تحقق من صلاحيات القاعدة'));
   });
 }
 
