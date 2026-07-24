@@ -207,15 +207,6 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
       </div>
     </div>
 
-    <div class="locbar">
-      <div class="row" id="locRow"><i class="ti ti-map-pin"></i> <span id="locLabel">لسه محددتش موقع التوصيل</span></div>
-      <input type="text" id="manualLoc" placeholder="اكتب عنوانك يدوي (الحي، الشارع، رقم العمارة)">
-      <div class="actions">
-        <button class="btn-sm gold" onclick="detectLocation()"><i class="ti ti-current-location"></i> تحديد تلقائي</button>
-        <button class="btn-sm" onclick="saveManualLoc()"><i class="ti ti-check"></i> حفظ العنوان</button>
-      </div>
-    </div>
-
     <div class="content">
       <div class="search"><i class="ti ti-search"></i><input placeholder="دور على مطعم أو صنف" id="searchInput" oninput="renderRestaurants()"></div>
 
@@ -256,6 +247,16 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
     <div class="topbar"><div class="back-row" onclick="go('screen-home')"><i class="ti ti-arrow-right"></i> سلتك</div><div></div></div>
     <div class="content">
       <div id="cartWrap"></div>
+
+      <div class="sec-title" style="margin-top:20px;">عنوان التوصيل</div>
+      <div class="locbar" style="margin:0 0 16px; border-radius:12px;">
+        <div class="row" id="locRow"><i class="ti ti-map-pin"></i> <span id="locLabel">لسه محددتش موقع التوصيل</span></div>
+        <input type="text" id="manualLoc" placeholder="اكتب عنوانك يدوي (الحي، الشارع، رقم العمارة)">
+        <div class="actions">
+          <button class="btn-sm gold" onclick="detectLocation()"><i class="ti ti-current-location"></i> تحديد تلقائي</button>
+          <button class="btn-sm" onclick="saveManualLoc()"><i class="ti ti-check"></i> حفظ العنوان</button>
+        </div>
+      </div>
 
       <div class="sec-title" style="margin-top:20px;">رقم موبايلك</div>
       <input id="custPhone" type="tel" placeholder="01xxxxxxxxx" style="width:100%; border:1px solid var(--line-strong); border-radius:10px; padding:11px 13px; font-family:inherit; font-size:13px; margin-bottom:6px;">
@@ -617,7 +618,7 @@ function validateConfirm(){
 }
 function confirmOrder(){
   if(state.cart.length===0){ toast('السلة فاضية، ارجع اختار أصناف'); return; }
-  if(!state.location){ toast('حدد عنوان التوصيل من الصفحة الرئيسية الأول'); go('screen-home'); return; }
+  if(!state.location){ toast('حدد عنوان التوصيل فوق الأول'); return; }
   const phone = document.getElementById('custPhone').value.trim();
   if(!phone){ toast('اكتب رقم موبايلك الأول'); return; }
   if(!state.payMethod){ toast('اختار طريقة الدفع تحت'); return; }
