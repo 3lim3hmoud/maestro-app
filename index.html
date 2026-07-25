@@ -732,21 +732,31 @@ function renderAds(){
     return;
   }
   wrap.innerHTML = state.ads.map((a,i)=>`
-    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.offerItems?`openOfferDetail(${i})`:(a.restId?`openMenu('${a.restId}')`:'')}"><span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p></div>
+    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="openOfferDetail(${i})"><span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p></div>
   `).join('');
   startAdsAutoplay();
 }
 function openOfferDetail(i){
   const a = state.ads[i];
-  if(!a || !a.offerItems) return;
+  if(!a) return;
   const r = state.restaurants.find(x=>x.id===a.restId);
   document.getElementById('offerCover').style.backgroundImage = a.img?`url('${a.img}')`:'';
   document.getElementById('offerTitle').textContent = a.title;
   document.getElementById('offerDesc').textContent = a.desc || '';
   document.getElementById('offerRest').innerHTML = r?`<i class="ti ti-building-store"></i> ${r.name}`:'';
-  const total = a.offerItems.reduce((s,oi)=>s+oi.price*(oi.qty||1),0);
-  document.getElementById('offerPrice').textContent = `${total} ج.م`;
-  document.getElementById('offerOrderBtn').setAttribute('onclick', `orderOffer(${i})`);
+  const priceEl = document.getElementById('offerPrice');
+  const btn = document.getElementById('offerOrderBtn');
+  if(a.offerItems){
+    const total = a.offerItems.reduce((s,oi)=>s+oi.price*(oi.qty||1),0);
+    priceEl.textContent = `${total} ج.م`;
+    priceEl.style.display = 'block';
+    btn.innerHTML = `<i class="ti ti-shopping-cart-plus"></i> اطلب العرض دلوقتي`;
+    btn.setAttribute('onclick', `orderOffer(${i})`);
+  } else {
+    priceEl.style.display = 'none';
+    btn.innerHTML = `<i class="ti ti-building-store"></i> اطلب من المطعم`;
+    btn.setAttribute('onclick', a.restId ? `openMenu('${a.restId}')` : `goBack()`);
+  }
   go('screen-offer');
 }
 function orderOffer(i){
@@ -826,7 +836,7 @@ function renderOffers(){
   }
   wrap.innerHTML = state.ads.map((a,i)=>{
     const r = state.restaurants.find(x=>x.id===a.restId);
-    const clickAction = a.offerItems?`openOfferDetail(${i})`:(a.restId?`openMenu('${a.restId}')`:'');
+    const clickAction = `openOfferDetail(${i})`;
     return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer; background-image:url('${a.img||''}');" onclick="${clickAction}">
       <span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p>
       ${r?`<p style="margin-top:6px; font-weight:700; color:var(--gold);"><i class="ti ti-building-store"></i> ${r.name} — اطلب الآن</p>`:''}
