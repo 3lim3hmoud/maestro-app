@@ -28,10 +28,11 @@
   --ease:cubic-bezier(.22,1,.36,1);
 }
 *{box-sizing:border-box; margin:0; padding:0;}
-body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased;}
+html, body{height:100%;}
+body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; overflow:hidden;}
 .mono{font-family:'JetBrains Mono',monospace;}
-#app{max-width:430px; margin:0 auto; min-height:100vh; background:var(--paper); position:relative; display:flex; flex-direction:column; box-shadow:0 0 70px rgba(0,0,0,.55); overflow:hidden;}
-.screen{display:none; flex:1; flex-direction:column; padding-bottom:80px;}
+#app{max-width:430px; margin:0 auto; height:100vh; height:100dvh; background:var(--paper); position:relative; display:flex; flex-direction:column; box-shadow:0 0 70px rgba(0,0,0,.55); overflow:hidden;}
+.screen{display:none; flex:1; flex-direction:column; padding-bottom:80px; min-height:0; overflow:hidden;}
 .screen.active{display:flex; animation:fade .32s var(--ease);}
 .screen.active.push-enter{animation:pushIn .34s var(--ease);}
 @keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
@@ -75,7 +76,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .btn-sm.gold{background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:700;}
 
 /* ---------- content ---------- */
-.content{padding:16px 18px; flex:1; overflow-y:auto;}
+.content{padding:16px 18px; flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;}
 .search{display:flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--line-strong); border-radius:var(--r-sm); padding:11px 13px; margin-bottom:16px; box-shadow:var(--sh-sm); transition:box-shadow .15s var(--ease), border-color .15s var(--ease);}
 .search:focus-within{border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(242,183,5,.14);}
 .search input{border:none; background:none; outline:none; flex:1; font-family:inherit; font-size:13px; color:var(--ink);}
@@ -378,7 +379,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
     </div>
     <div class="content" id="dishList" style="flex:1;"></div>
     <div class="checkout-bar" id="menuCheckoutBar" style="display:none;">
-      <button class="btn-main" onclick="go('screen-cart')"><i class="ti ti-shopping-cart"></i> <span id="menuCartText">شاهد السلة</span></button>
+      <button class="btn-main" onclick="go('screen-cart')"><i class="ti ti-basket"></i> <span id="menuCartText">شاهد السلة</span></button>
     </div>
   </div>
 
@@ -631,7 +632,9 @@ let state = {
   ],
   ads: [
     { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina' },
-    { title: 'اشتري 1 واحصل على التاني بخصم 50%', desc: 'La Rotunda — عرض لفترة محدودة', img: './images/la-rotunda/offer-buy1get50.png', restId: 'la-rotunda',
+    { title: 'تريبل بوكس', desc: 'La Rotunda — 3 برجر + بروستد + بطاطس، بريكة كبيرة تكفي أكتر من واحد', img: './images/la-rotunda/offer-triple-box.jpg', restId: 'la-rotunda' },
+    { title: 'عرض الويك إند', desc: 'La Rotunda — باكت 10 قطع بروستد + فرايز + 3 أرز + 2 كول سلو', img: './images/la-rotunda/offer-weekend-bucket.jpg', restId: 'la-rotunda' },
+    { title: 'اشتري 1 واحصل على التاني بخصم 50%', desc: 'La Rotunda — عرض لفترة محدودة', img: './images/la-rotunda/offer-buy1get50-v2.jpg', restId: 'la-rotunda',
       offerItems: [{name:'وجبة بروستد (عرض 1+50%)', price:150, qty:1}] }
   ],
   wallet: { vodafone: '01000000000', instapay: '01000000000@instapay' },
@@ -805,7 +808,7 @@ function renderOffers(){
   wrap.innerHTML = state.ads.map((a,i)=>{
     const r = state.restaurants.find(x=>x.id===a.restId);
     const clickAction = a.offerItems?`orderOffer(${i})`:(a.restId?`openMenu('${a.restId}')`:'');
-    return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer;" onclick="${clickAction}">
+    return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer; background-image:url('${a.img||''}');" onclick="${clickAction}">
       <span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p>
       ${r?`<p style="margin-top:6px; font-weight:700; color:var(--gold);"><i class="ti ti-building-store"></i> ${r.name} — اطلب الآن</p>`:''}
     </div>`;
@@ -891,7 +894,7 @@ function updateCartBadge(){
 function renderCart(){
   const wrap = document.getElementById('cartWrap');
   if(state.cart.length===0){
-    wrap.innerHTML = `<div class="empty-state"><i class="ti ti-shopping-cart-off"></i><p>السلة فاضية، اختار مطعم وابدأ اطلب</p></div>`;
+    wrap.innerHTML = `<div class="empty-state"><i class="ti ti-basket-off"></i><p>السلة فاضية، اختار مطعم وابدأ اطلب</p></div>`;
     document.getElementById('confirmBtn').disabled = true;
     return;
   }
