@@ -59,9 +59,9 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 .search i{color:var(--muted);}
 
 /* ---------- ads ---------- */
-.ads{display:flex; gap:10px; overflow-x:auto; margin-bottom:18px; padding-bottom:2px;}
+.ads{display:flex; gap:10px; overflow-x:auto; margin-bottom:18px; padding-bottom:2px; scroll-snap-type:x mandatory;}
 .ads::-webkit-scrollbar{display:none;}
-.ad-card{min-width:90%; height:130px; background:var(--ink); background-size:cover; background-position:center; border-radius:16px; padding:18px; color:#fff; position:relative; overflow:hidden; flex-shrink:0; border:1px solid #2a2820; display:flex; flex-direction:column; justify-content:flex-end;}
+.ad-card{min-width:90%; height:130px; background:var(--ink); background-size:cover; background-position:center; border-radius:16px; padding:18px; color:#fff; position:relative; overflow:hidden; flex-shrink:0; border:1px solid #2a2820; display:flex; flex-direction:column; justify-content:flex-end; scroll-snap-align:start;}
 .ad-card::before{content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,9,7,.88) 0%, rgba(10,9,7,.35) 55%, rgba(10,9,7,.15) 100%);}
 .ad-card::after{content:''; position:absolute; left:-20px; top:-30px; width:110px; height:110px; background:var(--gold); opacity:.1; border-radius:50%;}
 .ad-card .tag, .ad-card h3, .ad-card p{position:relative; z-index:1;}
@@ -591,6 +591,28 @@ function renderAds(){
   wrap.innerHTML = state.ads.map(a=>`
     <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.restId?`openMenu('${a.restId}')`:''}"><span class="tag">عرض</span><h3>${a.title}</h3><p>${a.desc}</p></div>
   `).join('');
+  startAdsAutoplay();
+}
+
+let adsTimer=null, adsIndex=0, adsPauseTimeout=null;
+function startAdsAutoplay(){
+  clearInterval(adsTimer);
+  const wrap = document.getElementById('adsWrap');
+  if(!wrap || state.ads.length<=1) return;
+  adsIndex = 0;
+  adsTimer = setInterval(()=>{
+    adsIndex = (adsIndex+1) % state.ads.length;
+    const card = wrap.children[adsIndex];
+    if(card) card.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+  }, 3500);
+  if(!wrap.dataset.wired){
+    wrap.dataset.wired = '1';
+    wrap.addEventListener('scroll', ()=>{
+      clearInterval(adsTimer);
+      clearTimeout(adsPauseTimeout);
+      adsPauseTimeout = setTimeout(startAdsAutoplay, 5000);
+    });
+  }
 }
 
 function renderCats(){
