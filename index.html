@@ -158,12 +158,13 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 
 /* ---------- menu screen ---------- */
 .menu-header{position:relative;}
-.menu-header .cover{height:130px; background:var(--ink) linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.35) 100%); background-size:cover; background-position:center;}
+.menu-header .cover{height:150px; background:var(--ink) linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 100%); background-size:cover; background-position:center;}
 .menu-header .back{position:absolute; top:16px; right:16px; width:34px; height:34px; background:rgba(255,255,255,.95); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 3px 10px rgba(0,0,0,.25);}
 .menu-header .back:active{transform:scale(.88);}
-.menu-header .info{padding:14px 18px; border-bottom:1px solid var(--line); background:#fff; position:relative; box-shadow:var(--sh-sm);}
-.menu-header .info h2{font-size:18px; font-weight:900;}
-.menu-header .info .meta{font-size:11.5px; color:var(--muted); margin-top:5px; display:flex; gap:10px; align-items:center;}
+.menu-header .info{padding:16px 18px 14px; border-radius:20px 20px 0 0; background:#fff; position:relative; box-shadow:0 -8px 20px rgba(20,19,17,.08); margin-top:-16px; z-index:2;}
+.menu-header .info h2{font-size:19px; font-weight:900;}
+.menu-header .info .meta{font-size:11px; color:var(--ink2); margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.menu-header .info .meta .m-pill{background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:4px 10px; display:flex; align-items:center; gap:5px; font-weight:600;}
 .menu-header .info .meta i{color:var(--gold-deep);}
 .dish{display:flex; justify-content:space-between; align-items:center; padding:13px 0 13px; margin:0 -18px; padding-inline:18px; border-bottom:1px solid var(--line); gap:10px; transition:background-color .15s var(--ease);}
 .dish:active{background:var(--panel);}
@@ -178,7 +179,8 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 
 /* ---------- big dish cards (image + add / size picker) ---------- */
 .dish-big{margin:0 0 16px;}
-.dish-big .db-card{background:#fff; border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--sh-md); border:1px solid var(--line);}
+.dish-big .db-card{background:#fff; border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--sh-md); border:1px solid var(--line); transition:transform .18s var(--ease), box-shadow .18s var(--ease);}
+.dish-big:active .db-card{transform:scale(.985);}
 .dish-big .db-img-wrap{position:relative; width:100%; aspect-ratio:16/10; background:var(--panel);}
 .dish-big .db-img{width:100%; height:100%; background-size:cover; background-position:center;}
 .dish-big .db-cartbadge{position:absolute; top:10px; inset-inline-start:10px; background:var(--ink); color:var(--gold); font-size:11px; font-weight:800; border-radius:20px; padding:4px 10px; font-family:'JetBrains Mono',monospace; box-shadow:0 3px 8px rgba(0,0,0,.25);}
@@ -186,9 +188,10 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .dish-big .db-body h5{font-size:15px; font-weight:800; margin-bottom:5px;}
 .dish-big .db-body .db-desc{font-size:11.5px; color:var(--muted); line-height:1.55; margin-bottom:11px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
 .dish-big .db-price-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
-.dish-big .db-price{font-size:14px; font-weight:800; color:var(--gold-deep); font-family:'JetBrains Mono',monospace; white-space:nowrap;}
+.dish-big .db-price{font-size:14.5px; font-weight:900; color:var(--gold-deep); font-family:'JetBrains Mono',monospace; white-space:nowrap;}
 .db-choose-btn{background:var(--ink); color:var(--gold); border:none; border-radius:20px; padding:9px 15px; font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:5px; font-family:inherit; box-shadow:0 3px 8px rgba(20,19,17,.25); white-space:nowrap;}
-.db-tap-hint{width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; box-shadow:0 3px 8px rgba(20,19,17,.25);}
+.db-tap-hint{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--gold-soft),var(--gold)); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 4px 10px rgba(242,183,5,.35); transition:transform .15s var(--ease);}
+.dish-big:active .db-tap-hint{transform:scale(.88) rotate(90deg);}
 
 /* ---------- dish detail sheet (McDonald's style: image + info + qty + add) ---------- */
 .ds-hero{width:100%; aspect-ratio:16/10; border-radius:14px; background-size:cover; background-position:center; margin-bottom:14px; background-color:var(--panel);}
@@ -235,9 +238,11 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .total-row.grand{font-weight:900; font-size:16px; color:var(--ink); border-top:1px solid var(--line); margin-top:6px; padding-top:10px;}
 .total-row.grand .pr{font-family:'JetBrains Mono',monospace;}
 
-.pay-opt{display:flex; align-items:center; gap:11px; border:1.5px solid var(--line); border-radius:var(--r-md); padding:13px; margin-bottom:9px; cursor:pointer; background:#fff; box-shadow:var(--sh-sm);}
-.pay-opt.selected{border-color:var(--gold); background:#FFFBEF; box-shadow:0 3px 10px rgba(242,183,5,.18);}
-.pay-opt i{font-size:20px; color:var(--ink); width:24px; text-align:center;}
+.pay-opt{display:flex; align-items:center; gap:11px; border:1.5px solid var(--line); border-radius:var(--r-md); padding:13px; margin-bottom:9px; cursor:pointer; background:#fff; box-shadow:var(--sh-sm); transition:transform .15s var(--ease), border-color .15s var(--ease), background-color .15s var(--ease);}
+.pay-opt:active{transform:scale(.985);}
+.pay-opt.selected{border-color:var(--gold); background:#FFFBEF; box-shadow:0 4px 14px rgba(242,183,5,.22);}
+.pay-opt i{font-size:17px; color:var(--ink); width:34px; height:34px; border-radius:10px; background:var(--panel); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.pay-opt.selected i{background:var(--gold); color:var(--ink);}
 .pay-opt .t{flex:1;}
 .pay-opt .t b{font-size:13px; display:block;}
 .pay-opt .t small{font-size:11px; color:var(--muted);}
@@ -940,7 +945,7 @@ function openMenu(id){
   if(!r) return;
   document.getElementById('menuCover').style.backgroundImage = r.img?`url(${r.img})`:'';
   document.getElementById('menuName').textContent = r.name;
-  document.getElementById('menuMeta').innerHTML = `<i class="ti ti-tag"></i> ${r.cat||''} <span>&middot;</span> <i class="ti ti-clock"></i> ${r.time||'—'}`;
+  document.getElementById('menuMeta').innerHTML = `<span class="m-pill"><i class="ti ti-tag"></i> ${r.cat||''}</span><span class="m-pill"><i class="ti ti-clock"></i> ${r.time||'—'}</span>`;
   const list = document.getElementById('dishList');
   if(r.dishes.length===0){
     list.innerHTML = `<div class="empty-state"><i class="ti ti-tools-kitchen-2"></i><p>مفيش أصناف مضافة للمطعم ده لسه.<br>ضيفها من لوحة الإدارة ⚙</p></div>`;
