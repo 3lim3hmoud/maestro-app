@@ -50,7 +50,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .cart-btn:active, .qty-ctrl button:active, .navbtn:active{transform:scale(.88);}
 
 /* ---------- topbar ---------- */
-.topbar{background:linear-gradient(180deg,var(--ink) 0%,#1a1815 100%); color:#fff; padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:20; border-bottom:2px solid var(--gold); box-shadow:0 6px 16px rgba(0,0,0,.22);}
+.topbar{background:linear-gradient(180deg,var(--ink) 0%,#1a1815 100%); color:#fff; padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:20; border-bottom:2px solid var(--gold); box-shadow:0 6px 16px rgba(0,0,0,.22), inset 0 -1px 0 rgba(242,183,5,.08);}
 .logo{display:flex; align-items:center; gap:9px;}
 .logo svg{width:32px; height:32px; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
 .logo b{font-weight:900; font-size:19px; letter-spacing:.5px; display:block; line-height:1;}
@@ -120,18 +120,21 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .rest-card .meta i{color:var(--gold-deep); font-size:12px;}
 
 .empty-state{text-align:center; padding:48px 20px; color:var(--muted);}
-.empty-state i{font-size:40px; color:var(--line-strong); display:block; margin-bottom:12px;}
+.empty-state i{font-size:26px; color:var(--gold-deep); display:flex; align-items:center; justify-content:center; width:64px; height:64px; margin:0 auto 14px; border-radius:50%; background:var(--panel);}
 .empty-state p{font-size:13px; line-height:1.7;}
 
 /* ---------- home hero / perks / gifts ---------- */
-.hero{background:linear-gradient(135deg,var(--ink) 0%, #2b2820 100%); border-radius:var(--r-lg); padding:22px 20px; color:#fff; margin-bottom:18px; position:relative; overflow:hidden; box-shadow:var(--sh-lg);}
+.hero{background:linear-gradient(135deg,var(--ink) 0%, #2b2820 100%); border-radius:var(--r-lg); padding:24px 20px; color:#fff; margin-bottom:18px; position:relative; overflow:hidden; box-shadow:var(--sh-lg); border:1px solid rgba(242,183,5,.15);}
 .hero::after{content:''; position:absolute; left:-30px; bottom:-30px; width:140px; height:140px; background:var(--gold); opacity:.14; border-radius:50%;}
 .hero::before{content:''; position:absolute; right:-10px; top:-40px; width:120px; height:120px; background:var(--bolt); opacity:.08; border-radius:50%;}
-.hero h2{font-size:19px; font-weight:900; margin-bottom:6px; position:relative; z-index:1;}
-.hero p{font-size:12px; color:#cfc9b6; position:relative; z-index:1; line-height:1.5;}
+.hero-badge{position:relative; z-index:1; display:inline-flex; align-items:center; gap:5px; background:rgba(242,183,5,.14); border:1px solid rgba(242,183,5,.3); color:var(--gold); font-size:10px; font-weight:700; padding:4px 10px; border-radius:20px; margin-bottom:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.3px;}
+.hero h2{font-size:20px; font-weight:900; margin-bottom:7px; position:relative; z-index:1; line-height:1.35;}
+.hero h2 .accent{background:linear-gradient(135deg,var(--gold-soft),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p{font-size:12.5px; color:#cfc9b6; position:relative; z-index:1; line-height:1.6;}
 .perks{display:flex; gap:9px; margin-bottom:20px;}
-.perk{flex:1; background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:12px 6px; text-align:center; box-shadow:var(--sh-sm);}
-.perk i{font-size:19px; color:var(--gold-deep); margin-bottom:6px; display:block;}
+.perk{flex:1; background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:13px 6px 11px; text-align:center; box-shadow:var(--sh-sm);}
+.perk .perk-ic{width:30px; height:30px; margin:0 auto 7px; border-radius:50%; background:linear-gradient(135deg,#fdf3d6,#f7e6a8); display:flex; align-items:center; justify-content:center;}
+.perk i{font-size:15px; color:var(--gold-deep); display:block;}
 .perk span{font-size:9.5px; font-weight:700; color:var(--ink2); display:block; line-height:1.3;}
 .gift-teaser{background:linear-gradient(135deg,#8a5c00,#F2B705); border-radius:var(--r-lg); padding:16px 18px; color:#141311; display:flex; align-items:center; gap:12px; margin-bottom:22px; cursor:pointer; box-shadow:var(--sh-gold); position:relative; overflow:hidden;}
 .gift-teaser::after{content:''; position:absolute; left:-24px; top:-24px; width:90px; height:90px; background:rgba(255,255,255,.25); border-radius:50%;}
@@ -255,6 +258,15 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .driver-card .n small{font-size:11px; color:#a39d89;}
 .driver-card i{font-size:20px; color:var(--gold);}
 
+/* ---------- admin access gate ---------- */
+.pin-card{background:#fff; border-radius:18px; padding:26px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4); margin:auto;}
+.pin-card i{font-size:30px; color:var(--gold-deep); margin-bottom:10px; display:block;}
+.pin-card h3{font-size:16px; font-weight:900; margin-bottom:6px;}
+.pin-card p{font-size:12px; color:var(--muted); margin-bottom:16px; line-height:1.6;}
+.pin-card input{width:100%; border:1.5px solid var(--line-strong); border-radius:10px; padding:13px; font-family:'JetBrains Mono',monospace; font-size:20px; text-align:center; letter-spacing:6px;}
+.pin-card button{width:100%; margin-top:14px; background:var(--ink); color:var(--gold); border:none; border-radius:10px; padding:13px; font-family:inherit; font-weight:900; font-size:13.5px;}
+.pin-card .err{color:var(--danger); font-size:11.5px; margin-top:9px; display:none; font-weight:700;}
+
 /* ---------- admin ---------- */
 .admin-fab{position:fixed; bottom:16px; left:50%; transform:translateX(calc(-215px + 16px)); width:40px; height:40px; background:var(--ink); color:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; z-index:50; border:2px solid var(--gold);}
 .overlay{position:fixed; inset:0; background:rgba(10,9,7,.6); display:none; align-items:flex-end; justify-content:center; z-index:100; backdrop-filter:blur(2px); animation:overlayIn .2s ease;}
@@ -303,15 +315,16 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
       <div class="search" onclick="go('screen-restaurants')"><i class="ti ti-search"></i><span style="color:var(--muted); font-size:13px;">دور على مطعم أو صنف</span></div>
 
       <div class="hero">
-        <h2>جعان؟ إحنا جاهزين 🔥</h2>
+        <div class="hero-badge"><i class="ti ti-map-pin-filled"></i> بيتوصلك دلوقتي</div>
+        <h2>جعان؟ إحنا <span class="accent">جاهزين</span> 🔥</h2>
         <p>أشهى المطاعم في مدينتك، توصيل سريع وطلب في ثواني</p>
       </div>
 
       <div class="perks">
-        <div class="perk"><i class="ti ti-bolt"></i><span>توصيل سريع</span></div>
-        <div class="perk"><i class="ti ti-shield-check"></i><span>دفع آمن</span></div>
-        <div class="perk"><i class="ti ti-map-pin"></i><span>تتبع لحظي</span></div>
-        <div class="perk"><i class="ti ti-star"></i><span>جودة مضمونة</span></div>
+        <div class="perk"><div class="perk-ic"><i class="ti ti-bolt"></i></div><span>توصيل سريع</span></div>
+        <div class="perk"><div class="perk-ic"><i class="ti ti-shield-check"></i></div><span>دفع آمن</span></div>
+        <div class="perk"><div class="perk-ic"><i class="ti ti-map-pin"></i></div><span>تتبع لحظي</span></div>
+        <div class="perk"><div class="perk-ic"><i class="ti ti-star"></i></div><span>جودة مضمونة</span></div>
       </div>
 
       <div class="sec-title">عروض عليك ماتفوتهاش <span onclick="go('screen-offers')" style="cursor:pointer;">شوف الكل</span></div>
@@ -476,6 +489,14 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
     </div>
   </div>
 
+  <!-- ================= ORDER HISTORY ================= -->
+  <div class="screen" id="screen-history">
+    <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> طلباتي السابقة</div><div></div></div>
+    <div class="content" id="historyContent">
+      <div class="empty-state"><i class="ti ti-receipt"></i><p>لسه معملتش أي طلب من الجهاز ده.</p></div>
+    </div>
+  </div>
+
   <!-- ================= FAVORITES ================= -->
   <div class="screen" id="screen-fav">
     <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> المفضلة</div><div></div></div>
@@ -501,7 +522,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
       </div>
       <div class="admin-item" onclick="go('screen-fav')"><span><i class="ti ti-heart"></i> مطاعمي المفضلة</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item" onclick="go('screen-orders')"><span><i class="ti ti-map-pin"></i> عناويني المحفوظة</span><i class="ti ti-chevron-left"></i></div>
-      <div class="admin-item" onclick="go('screen-orders')"><span><i class="ti ti-receipt"></i> طلباتي السابقة</span><i class="ti ti-chevron-left"></i></div>
+      <div class="admin-item" onclick="go('screen-history')"><span><i class="ti ti-receipt"></i> طلباتي السابقة</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item"><span><i class="ti ti-headset"></i> تواصل مع الدعم</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item"><span><i class="ti ti-info-circle"></i> عن ماسترو</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item" onclick="openAdmin()" style="margin-top:18px; border-color:var(--line-strong); opacity:.75;"><span><i class="ti ti-settings"></i> لوحة تحكم المطعم (تجريبي)</span><i class="ti ti-chevron-left"></i></div>
@@ -518,6 +539,17 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
   <!-- ADMIN SHEET -->
   <div class="overlay" id="dishSheetOverlay" onclick="if(event.target===this) closeDishSheet()">
     <div class="sheet" id="dishSheetBody"></div>
+  </div>
+
+  <div class="overlay" id="adminPinOverlay" onclick="if(event.target===this) closeAdminPin()" style="align-items:center;">
+    <div class="pin-card">
+      <i class="ti ti-shield-lock"></i>
+      <h3>دخول لوحة المطعم</h3>
+      <p>اكتب كود دخول الإدارة عشان تفتح لوحة التحكم.</p>
+      <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+      <button onclick="checkAdminPin()">دخول</button>
+      <div class="err" id="adminPinErr">كود غلط، جرب تاني</div>
+    </div>
   </div>
 
   <div class="overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
@@ -586,13 +618,13 @@ let state = {
     {
       id: 'koshary-afandina',
       name: 'كشري أفندينا',
-      img: './images/koshary-afandina/cover.png',
+      img: './images/koshary-afandina/cover.jpg',
       cat: 'كشري',
       time: '20-30 دقيقة',
       dishes: [
-        { id: 'ka-1', name: 'كشري أفندينا', price: 25, img: './images/koshary-afandina/dish-afandina.png' },
-        { id: 'ka-2', name: 'كشري لوكس', price: 35, img: './images/koshary-afandina/dish-lux.png' },
-        { id: 'ka-3', name: 'كشري ممتاز', price: 45, img: './images/koshary-afandina/dish-momtaz.png' }
+        { id: 'ka-1', name: 'كشري أفندينا', price: 25, img: './images/koshary-afandina/dish-afandina.jpg' },
+        { id: 'ka-2', name: 'كشري لوكس', price: 35, img: './images/koshary-afandina/dish-lux.jpg' },
+        { id: 'ka-3', name: 'كشري ممتاز', price: 45, img: './images/koshary-afandina/dish-momtaz.jpg' }
       ]
     },
     {
@@ -637,7 +669,7 @@ let state = {
     }
   ],
   ads: [
-    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina',
+    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.jpg', restId: 'koshary-afandina',
       offerItems: [{name:'عرض العودة (كشري أفندينا مقاس لوكس)', price:35, qty:1}] },
     { title: 'تريبل بوكس', desc: 'La Rotunda — 3 برجر + بروستد + بطاطس، بريكة كبيرة تكفي أكتر من واحد', img: './images/la-rotunda/offer-triple-box.jpg', restId: 'la-rotunda',
       offerItems: [{name:'تريبل بوكس (3 برجر + بروستد + بطاطس)', price:350, qty:1}] },
@@ -672,13 +704,14 @@ function toast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
-const stackScreens = ['screen-menu','screen-offer','screen-cart','screen-orders','screen-fav'];
+const stackScreens = ['screen-menu','screen-offer','screen-cart','screen-orders','screen-history','screen-fav'];
 function go(id, fromPop){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','push-enter'));
   const next = document.getElementById(id);
   next.classList.add('active');
   if(!fromPop && stackScreens.includes(id)) next.classList.add('push-enter');
   if(id==='screen-cart') renderCart();
+  if(id==='screen-history') renderHistory();
   if(!fromPop){
     if(id==='screen-home') history.replaceState({screen:id}, '', '#'+id);
     else history.pushState({screen:id}, '', '#'+id);
@@ -696,6 +729,10 @@ window.addEventListener('popstate', e=>{
   go(id, true);
 });
 history.replaceState({screen:'screen-home'}, '', '#screen-home');
+document.addEventListener('DOMContentLoaded', ()=>{
+  const pinEl = document.getElementById('adminPinInput');
+  if(pinEl) pinEl.addEventListener('keydown', e=>{ if(e.key==='Enter') checkAdminPin(); });
+});
 
 /* ---------------- LOCATION ---------------- */
 function detectLocation(){
@@ -1100,6 +1137,7 @@ function confirmOrder(){
   const newRef = db.ref('orders').push();
   newRef.set(orderObj).then(()=>{
     currentOrderId = newRef.key;
+    saveOrderToHistory(newRef.key);
     listenOrderStatus(currentOrderId);
     startTracking();
     document.getElementById('custPhone').value='';
@@ -1113,6 +1151,52 @@ function confirmOrder(){
   });
 }
 
+/* ---------------- ORDER HISTORY (local device) ---------------- */
+function saveOrderToHistory(orderId){
+  const ids = JSON.parse(localStorage.getItem('maestro_my_orders') || '[]');
+  ids.unshift(orderId);
+  localStorage.setItem('maestro_my_orders', JSON.stringify(ids.slice(0, 30)));
+}
+const HISTORY_STATUS_LABEL = {
+  pending: 'في انتظار تأكيد المطعم', accepted: 'المطعم بيجهز طلبك', preparing: 'المطعم بيجهز طلبك',
+  ready: 'جاهز وهيتسلم للسواق', on_the_way: 'في الطريق ليك', delivered: 'تم التسليم'
+};
+function renderHistory(){
+  const wrap = document.getElementById('historyContent');
+  const ids = JSON.parse(localStorage.getItem('maestro_my_orders') || '[]');
+  if(ids.length===0){
+    wrap.innerHTML = `<div class="empty-state"><i class="ti ti-receipt"></i><p>لسه معملتش أي طلب من الجهاز ده.</p></div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="empty-state"><i class="ti ti-loader"></i><p>بنجيب طلباتك...</p></div>`;
+  Promise.all(ids.map(id => db.ref('orders/'+id).once('value').then(snap=>({id, o:snap.val()}))))
+    .then(results=>{
+      const valid = results.filter(r=>r.o);
+      if(valid.length===0){
+        wrap.innerHTML = `<div class="empty-state"><i class="ti ti-receipt"></i><p>لسه معملتش أي طلب من الجهاز ده.</p></div>`;
+        return;
+      }
+      wrap.innerHTML = valid.map(({id,o})=>{
+        const itemsTxt = (o.items||[]).map(it=>`${it.name} ×${it.qty}`).join('، ');
+        const statusLabel = HISTORY_STATUS_LABEL[o.status] || o.status;
+        const canTrack = o.status !== 'delivered';
+        return `<div class="ticket" style="margin-bottom:12px; ${canTrack?'cursor:pointer;':''}" ${canTrack?`onclick="reopenTracking('${id}')"`:''}>
+          <div class="ticket-head"><b>${o.restaurant||'طلب'}</b><span>${new Date(o.createdAt).toLocaleDateString('ar-EG')}</span></div>
+          <div class="tline"><span class="nm" style="white-space:normal;">${itemsTxt}</span></div>
+          <div class="totals">
+            <div class="total-row grand"><span>${statusLabel}</span><span class="pr">${o.total} ج.م</span></div>
+          </div>
+        </div>`;
+      }).join('');
+    })
+    .catch(()=>{ wrap.innerHTML = `<div class="empty-state"><i class="ti ti-alert-triangle"></i><p>حصل خطأ في تحميل الطلبات.</p></div>`; });
+}
+function reopenTracking(orderId){
+  currentOrderId = orderId;
+  listenOrderStatus(orderId);
+  startTracking();
+  go('screen-orders');
+}
 function listenOrderStatus(orderId){
   db.ref('orders/'+orderId).on('value', snap=>{
     const o = snap.val();
@@ -1210,7 +1294,30 @@ function resetImgPick(pickId, label){
 }
 
 /* ---------------- ADMIN QUICK-ADD (demo data entry) ---------------- */
-function openAdmin(){ document.getElementById('adminOverlay').classList.add('active'); refreshAdminSelectors(); renderAdminList(); }
+/* ---------- admin access gate (change this PIN any time) ---------- */
+const ADMIN_PIN = "4821";
+function openAdmin(){
+  if(localStorage.getItem('maestro_admin_ok')==='1'){
+    document.getElementById('adminOverlay').classList.add('active');
+    refreshAdminSelectors(); renderAdminList();
+  } else {
+    document.getElementById('adminPinOverlay').classList.add('active');
+    document.getElementById('adminPinInput').value = '';
+    document.getElementById('adminPinErr').style.display = 'none';
+  }
+}
+function closeAdminPin(){ document.getElementById('adminPinOverlay').classList.remove('active'); }
+function checkAdminPin(){
+  const val = document.getElementById('adminPinInput').value.trim();
+  if(val === ADMIN_PIN){
+    localStorage.setItem('maestro_admin_ok','1');
+    closeAdminPin();
+    document.getElementById('adminOverlay').classList.add('active');
+    refreshAdminSelectors(); renderAdminList();
+  } else {
+    document.getElementById('adminPinErr').style.display = 'block';
+  }
+}
 function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('active'); }
 function adminTab(tab){
   ['rest','dish','ad','wallet'].forEach(t=>{

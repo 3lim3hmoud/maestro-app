@@ -61,9 +61,30 @@ body{font-family:'Tajawal',sans-serif; background:var(--paper); color:var(--ink)
 .setup-card button{width:100%; margin-top:16px; background:var(--ink); color:var(--gold); border:none; border-radius:10px; padding:13px; font-family:inherit; font-weight:900; font-size:13.5px;}
 .driver-pill{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--gold); font-size:11px; font-weight:700; padding:8px 16px; border-radius:20px; display:flex; align-items:center; gap:8px; z-index:20;}
 .driver-pill button{background:none; border:none; color:#a39d89; font-size:11px; text-decoration:underline; font-family:inherit;}
+
+/* ---------- access gate ---------- */
+#pinGate{position:fixed; inset:0; background:linear-gradient(160deg,var(--ink),#231f18); z-index:999; display:flex; align-items:center; justify-content:center; padding:24px;}
+.pin-card{background:#fff; border-radius:18px; padding:26px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
+.pin-card i{font-size:30px; color:var(--gold-deep); margin-bottom:10px; display:block;}
+.pin-card h3{font-size:16px; font-weight:900; margin-bottom:6px;}
+.pin-card p{font-size:12px; color:var(--muted); margin-bottom:16px; line-height:1.6;}
+.pin-card input{width:100%; border:1.5px solid var(--line-strong); border-radius:10px; padding:13px; font-family:'JetBrains Mono',monospace; font-size:20px; text-align:center; letter-spacing:6px;}
+.pin-card button{width:100%; margin-top:14px; background:var(--ink); color:var(--gold); border:none; border-radius:10px; padding:13px; font-family:inherit; font-weight:900; font-size:13.5px;}
+.pin-card .err{color:var(--danger); font-size:11.5px; margin-top:9px; display:none; font-weight:700;}
 </style>
 </head>
 <body>
+
+<div id="pinGate">
+  <div class="pin-card">
+    <i class="ti ti-shield-lock"></i>
+    <h3>دخول السواقين</h3>
+    <p>اكتب كود الدخول الخاص بالسواقين عشان تفتح شاشة الطلبات.</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+    <button onclick="checkPin()">دخول</button>
+    <div class="err" id="pinErr">كود غلط، جرب تاني</div>
+  </div>
+</div>
 
 <div class="topbar">
   <div><b>تطبيق السواق</b><span>MAESTRO CAPTAIN</span></div>
@@ -102,6 +123,24 @@ body{font-family:'Tajawal',sans-serif; background:var(--paper); color:var(--ink)
 </div>
 
 <script>
+/* ---------- access gate (change this PIN any time) ---------- */
+const CAPTAIN_PIN = "7350";
+function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  if(val === CAPTAIN_PIN){
+    localStorage.setItem('maestro_captain_ok','1');
+    document.getElementById('pinGate').style.display='none';
+  } else {
+    document.getElementById('pinErr').style.display='block';
+  }
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(localStorage.getItem('maestro_captain_ok')==='1'){
+    document.getElementById('pinGate').style.display='none';
+  }
+  document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+});
+
 const firebaseConfig = {
   apiKey: "AIzaSyC2gMvHUG9j7hacZPvatn_3sThusofnW34",
   authDomain: "maestro-afandina.firebaseapp.com",
