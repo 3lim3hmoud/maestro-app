@@ -637,9 +637,12 @@ let state = {
     }
   ],
   ads: [
-    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina' },
-    { title: 'تريبل بوكس', desc: 'La Rotunda — 3 برجر + بروستد + بطاطس، بريكة كبيرة تكفي أكتر من واحد', img: './images/la-rotunda/offer-triple-box.jpg', restId: 'la-rotunda' },
-    { title: 'عرض الويك إند', desc: 'La Rotunda — باكت 10 قطع بروستد + فرايز + 3 أرز + 2 كول سلو', img: './images/la-rotunda/offer-weekend-bucket.jpg', restId: 'la-rotunda' },
+    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina',
+      offerItems: [{name:'عرض العودة (كشري أفندينا مقاس لوكس)', price:35, qty:1}] },
+    { title: 'تريبل بوكس', desc: 'La Rotunda — 3 برجر + بروستد + بطاطس، بريكة كبيرة تكفي أكتر من واحد', img: './images/la-rotunda/offer-triple-box.jpg', restId: 'la-rotunda',
+      offerItems: [{name:'تريبل بوكس (3 برجر + بروستد + بطاطس)', price:350, qty:1}] },
+    { title: 'عرض الويك إند', desc: 'La Rotunda — باكت 10 قطع بروستد + فرايز + 3 أرز + 2 كول سلو', img: './images/la-rotunda/offer-weekend-bucket.jpg', restId: 'la-rotunda',
+      offerItems: [{name:'عرض الويك إند (10 بروستد + فرايز + 3 أرز + 2 كول سلو)', price:420, qty:1}] },
     { title: 'اشتري 1 واحصل على التاني بخصم 50%', desc: 'La Rotunda — عرض لفترة محدودة', img: './images/la-rotunda/offer-buy1get50-v2.jpg', restId: 'la-rotunda',
       offerItems: [{name:'وجبة بروستد (عرض 1+50%)', price:150, qty:1}] }
   ],
