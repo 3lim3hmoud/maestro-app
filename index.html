@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#141311">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -330,7 +330,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
       <div class="search" onclick="go('screen-restaurants')"><i class="ti ti-search"></i><span style="color:var(--muted); font-size:13px;">دور على مطعم أو صنف</span></div>
 
       <div class="hero">
-        <div class="hero-badge"><i class="ti ti-map-pin-filled"></i> بيتوصلك دلوقتي</div>
+        <div class="hero-badge"><i class="ti ti-map-pin"></i> بيتوصلك دلوقتي</div>
         <h2>جعان؟ إحنا <span class="accent">جاهزين</span> 🔥</h2>
         <p>أشهى المطاعم في مدينتك، توصيل سريع وطلب في ثواني</p>
       </div>
@@ -866,7 +866,7 @@ function restCardHTML(r){
     <div class="rest-card" onclick="openMenu('${r.id}')">
       <div class="thumb ${r.img?'':'shimmer'}" style="background-image:url('${r.img||''}')">
         <span class="cat-tag">${r.cat||''}</span>
-        <span class="fav-btn ${fav?'on':''}" onclick="toggleFav('${r.id}', event)"><i class="ti ${fav?'ti-heart-filled':'ti-heart'}"></i></span>
+        <span class="fav-btn ${fav?'on':''}" onclick="toggleFav('${r.id}', event)"><i class="ti ti-heart"></i></span>
       </div>
       <div class="body"><h4>${r.name}</h4><div class="meta"><i class="ti ti-clock"></i> ${r.time||'—'}</div></div>
     </div>
