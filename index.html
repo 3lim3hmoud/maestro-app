@@ -37,8 +37,10 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 .logo span{display:block; font-size:9px; color:var(--gold); letter-spacing:3px; margin-top:3px; font-family:'JetBrains Mono',monospace;}
 .topbar .icons{display:flex; align-items:center; gap:16px; font-size:20px; position:relative;}
 .badge{position:absolute; top:-7px; left:-9px; background:var(--gold); color:var(--ink); font-size:10px; font-weight:700; border-radius:10px; padding:1px 5px; min-width:16px; text-align:center; font-family:'JetBrains Mono',monospace;}
-.back-row{color:#fff; display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+.back-row{color:#fff; display:flex; align-items:center; gap:12px; font-weight:700; font-size:14.5px; cursor:pointer;}
+.back-row .circle{width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold); flex-shrink:0;}
 .back-row i{font-size:18px;}
+.cart-btn{background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.18); width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; position:relative; font-size:18px; cursor:pointer;}
 
 /* ---------- location bar ---------- */
 .locbar{padding:12px 18px; background:var(--ink2); border-bottom:1px solid #333; color:#e7e3d6;}
@@ -216,8 +218,8 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
       </div>
       <div class="icons">
         <i class="ti ti-bell"></i>
-        <div style="position:relative" onclick="go('screen-cart')">
-          <i class="ti ti-shopping-cart"></i>
+        <div class="cart-btn" onclick="go('screen-cart')">
+          <i class="ti ti-basket"></i>
           <span class="badge" id="cartBadge" style="display:none">0</span>
         </div>
       </div>
@@ -264,7 +266,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
   <div class="screen" id="screen-offers">
     <div class="topbar">
       <div class="logo"><b style="font-size:16px;">العروض</b></div>
-      <div class="icons"><div style="position:relative" onclick="go('screen-cart')"><i class="ti ti-shopping-cart"></i><span class="badge" id="cartBadge2" style="display:none">0</span></div></div>
+      <div class="icons"><div class="cart-btn" onclick="go('screen-cart')"><i class="ti ti-basket"></i><span class="badge" id="cartBadge2" style="display:none">0</span></div></div>
     </div>
     <div class="content">
       <div class="sec-title">كل العروض الحالية</div>
@@ -283,7 +285,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
   <div class="screen" id="screen-restaurants">
     <div class="topbar">
       <div class="logo"><b style="font-size:16px;">المطاعم</b></div>
-      <div class="icons"><div style="position:relative" onclick="go('screen-cart')"><i class="ti ti-shopping-cart"></i><span class="badge" id="cartBadge3" style="display:none">0</span></div></div>
+      <div class="icons"><div class="cart-btn" onclick="go('screen-cart')"><i class="ti ti-basket"></i><span class="badge" id="cartBadge3" style="display:none">0</span></div></div>
     </div>
     <div class="content">
       <div class="search"><i class="ti ti-search"></i><input placeholder="دور على مطعم أو صنف" id="searchInput" oninput="renderRestaurants()"></div>
@@ -345,7 +347,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= CART ================= -->
   <div class="screen" id="screen-cart">
-    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> سلتك</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> سلتك</div><div></div></div>
     <div class="content">
       <div id="cartWrap"></div>
 
@@ -376,7 +378,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= ORDERS / TRACKING ================= -->
   <div class="screen" id="screen-orders">
-    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> تتبع الطلب</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> تتبع الطلب</div><div></div></div>
     <div class="content" style="padding:0; display:flex; flex-direction:column;" id="ordersContent">
       <div class="empty-state" style="margin-top:40px;"><i class="ti ti-map-2"></i><p>مفيش طلب شغال دلوقتي</p></div>
     </div>
@@ -384,7 +386,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= FAVORITES ================= -->
   <div class="screen" id="screen-fav">
-    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> المفضلة</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> المفضلة</div><div></div></div>
     <div class="content"><div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div></div>
     <div class="bottomnav">
       <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
@@ -397,7 +399,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
 
   <!-- ================= ACCOUNT ================= -->
   <div class="screen" id="screen-account">
-    <div class="topbar"><div class="back-row" onclick="goBack()"><i class="ti ti-arrow-right"></i> حسابي</div><div></div></div>
+    <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> حسابي</div><div></div></div>
     <div class="content">
       <div class="ticket" style="margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -410,6 +412,7 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
       <div class="admin-item" onclick="go('screen-orders')"><span><i class="ti ti-receipt"></i> طلباتي السابقة</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item"><span><i class="ti ti-headset"></i> تواصل مع الدعم</span><i class="ti ti-chevron-left"></i></div>
       <div class="admin-item"><span><i class="ti ti-info-circle"></i> عن ماسترو</span><i class="ti ti-chevron-left"></i></div>
+      <div class="admin-item" onclick="openAdmin()" style="margin-top:18px; border-color:var(--line-strong); opacity:.75;"><span><i class="ti ti-settings"></i> لوحة تحكم المطعم (تجريبي)</span><i class="ti ti-chevron-left"></i></div>
     </div>
     <div class="bottomnav">
       <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
@@ -419,8 +422,6 @@ body{font-family:'Tajawal',sans-serif; background:#0c0b09; color:var(--ink); -we
       <button class="navbtn active"><i class="ti ti-user"></i>حسابي</button>
     </div>
   </div>
-
-  <button class="admin-fab" onclick="openAdmin()"><i class="ti ti-settings"></i></button>
 
   <!-- ADMIN SHEET -->
   <div class="overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
