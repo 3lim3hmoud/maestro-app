@@ -116,6 +116,9 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .shimmer{background-image:linear-gradient(100deg,var(--panel) 40%, #fbf8ee 50%, var(--panel) 60%) !important; background-size:200% 100% !important; background-position:0 0 !important; animation:shimmer 1.4s infinite linear;}
 @keyframes shimmer{0%{background-position:200% 0} 100%{background-position:-200% 0}}
 .rest-card .thumb .cat-tag{position:absolute; top:7px; right:7px; background:rgba(20,19,17,.82); color:var(--gold); font-size:9px; font-weight:700; padding:3px 8px; border-radius:6px; backdrop-filter:blur(2px);}
+.rest-card .thumb .fav-btn{position:absolute; top:7px; left:7px; width:26px; height:26px; border-radius:50%; background:rgba(20,19,17,.55); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; transition:transform .15s var(--ease), background-color .15s var(--ease), color .15s var(--ease);}
+.rest-card .thumb .fav-btn:active{transform:scale(.85);}
+.rest-card .thumb .fav-btn.on{color:var(--bolt); background:rgba(255,255,255,.9);}
 .rest-card .body{padding:10px 11px 12px;}
 .rest-card h4{font-size:13.5px; font-weight:700; margin-bottom:5px; line-height:1.3;}
 .rest-card .meta{font-size:10.5px; color:var(--muted); display:flex; align-items:center; gap:5px;}
@@ -507,7 +510,7 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
   <!-- ================= FAVORITES ================= -->
   <div class="screen" id="screen-fav">
     <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> المفضلة</div><div></div></div>
-    <div class="content"><div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div></div>
+    <div class="content" id="favContent"><div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div></div>
     <div class="bottomnav">
       <button class="navbtn" onclick="go('screen-home')"><i class="ti ti-home"></i>الرئيسية</button>
       <button class="navbtn" onclick="go('screen-offers')"><i class="ti ti-discount-2"></i>العروض</button>
@@ -719,6 +722,7 @@ function go(id, fromPop){
   if(!fromPop && stackScreens.includes(id)) next.classList.add('push-enter');
   if(id==='screen-cart') renderCart();
   if(id==='screen-history') renderHistory();
+  if(id==='screen-fav') renderFavorites();
   if(!fromPop){
     if(id==='screen-home') history.replaceState({screen:id}, '', '#'+id);
     else history.pushState({screen:id}, '', '#'+id);
@@ -838,6 +842,42 @@ function startAdsAutoplay(){
   }
 }
 
+/* ---------------- FAVORITES (local device) ---------------- */
+function getFavs(){ return JSON.parse(localStorage.getItem('maestro_favs') || '[]'); }
+function isFav(id){ return getFavs().includes(id); }
+function toggleFav(id, ev){
+  if(ev) ev.stopPropagation();
+  let favs = getFavs();
+  if(favs.includes(id)){ favs = favs.filter(x=>x!==id); toast('اتشال من المفضلة'); }
+  else { favs.push(id); toast('اتضاف للمفضلة'); }
+  localStorage.setItem('maestro_favs', JSON.stringify(favs));
+  renderRestaurants(); renderRestPreview();
+  const favScreen = document.getElementById('screen-fav');
+  if(favScreen && favScreen.classList.contains('active')) renderFavorites();
+}
+function restCardHTML(r){
+  const fav = isFav(r.id);
+  return `
+    <div class="rest-card" onclick="openMenu('${r.id}')">
+      <div class="thumb ${r.img?'':'shimmer'}" style="background-image:url('${r.img||''}')">
+        <span class="cat-tag">${r.cat||''}</span>
+        <span class="fav-btn ${fav?'on':''}" onclick="toggleFav('${r.id}', event)"><i class="ti ${fav?'ti-heart-filled':'ti-heart'}"></i></span>
+      </div>
+      <div class="body"><h4>${r.name}</h4><div class="meta"><i class="ti ti-clock"></i> ${r.time||'—'}</div></div>
+    </div>
+  `;
+}
+function renderFavorites(){
+  const el = document.getElementById('favContent');
+  const favs = getFavs();
+  const list = state.restaurants.filter(r=>favs.includes(r.id));
+  if(list.length===0){
+    el.innerHTML = `<div class="empty-state"><i class="ti ti-heart"></i><p>لسه معندكش مطاعم مفضلة.<br>اضغط على ♡ في أي مطعم عشان تضيفه هنا.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="rest-grid">` + list.map(restCardHTML).join('') + `</div>`;
+}
+
 function renderCats(){
   const cats = ['الكل', ...new Set(state.restaurants.map(r=>r.cat).filter(Boolean))];
   document.getElementById('catsWrap').innerHTML = cats.map(c=>
@@ -863,15 +903,7 @@ function renderRestaurants(){
     el.innerHTML = `<div class="empty-state"><i class="ti ti-building-store"></i><p>لسه مفيش مطاعم متضافة.<br>اضغط على ⚙ تحت واضف أول مطعم.</p></div>`;
     return;
   }
-  el.innerHTML = `<div class="rest-grid">` + list.map(r=>`
-    <div class="rest-card" onclick="openMenu('${r.id}')">
-      <div class="thumb ${r.img?'':'shimmer'}" style="background-image:url('${r.img||''}')"><span class="cat-tag">${r.cat||''}</span></div>
-      <div class="body">
-        <h4>${r.name}</h4>
-        <div class="meta"><i class="ti ti-clock"></i> ${r.time||'—'}</div>
-      </div>
-    </div>
-  `).join('') + `</div>`;
+  el.innerHTML = `<div class="rest-grid">` + list.map(restCardHTML).join('') + `</div>`;
 }
 
 function renderOffers(){
@@ -899,12 +931,7 @@ function renderRestPreview(){
     return;
   }
   const list = state.restaurants.slice(0,4);
-  el.innerHTML = `<div class="rest-grid">` + list.map(r=>`
-    <div class="rest-card" onclick="openMenu('${r.id}')">
-      <div class="thumb ${r.img?'':'shimmer'}" style="background-image:url('${r.img||''}')"><span class="cat-tag">${r.cat||''}</span></div>
-      <div class="body"><h4>${r.name}</h4><div class="meta"><i class="ti ti-clock"></i> ${r.time||'—'}</div></div>
-    </div>
-  `).join('') + `</div>`;
+  el.innerHTML = `<div class="rest-grid">` + list.map(restCardHTML).join('') + `</div>`;
 }
 
 /* ---------------- MENU SCREEN ---------------- */
