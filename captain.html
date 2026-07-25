@@ -117,6 +117,7 @@ const db = firebase.database();
 const PAY_LABELS = {cash:'كاش عند الاستلام', vodafone:'فودافون كاش', instapay:'إنستاباي'};
 let orders = {};
 let driver = null;
+let watchers = {}; // orderId -> geolocation watch id
 
 function loadDriver(){
   const raw = localStorage.getItem('maestro_driver');
@@ -173,6 +174,30 @@ function render(){
   mineList.innerHTML = mine.length===0
     ? `<div class="empty"><i class="ti ti-motorbike"></i><p>مفيش طلبات معاك دلوقتي</p></div>`
     : mine.map(([id,o])=>orderCard(id,o,'deliver')).join('');
+
+  syncLocationWatchers(mine.map(([id])=>id));
+}
+
+function syncLocationWatchers(activeIds){
+  // stop sharing for orders no longer active (delivered / not mine anymore)
+  Object.keys(watchers).forEach(id=>{
+    if(!activeIds.includes(id)){
+      navigator.geolocation.clearWatch(watchers[id]);
+      delete watchers[id];
+    }
+  });
+  // start sharing for newly active orders
+  activeIds.forEach(id=>{
+    if(watchers[id]) return;
+    if(!navigator.geolocation){ return; }
+    watchers[id] = navigator.geolocation.watchPosition(
+      pos=>{
+        db.ref('orders/'+id).update({driverLat: pos.coords.latitude, driverLng: pos.coords.longitude});
+      },
+      err=>{ console.error('Location share failed:', err); },
+      {enableHighAccuracy:true, maximumAge:5000, timeout:15000}
+    );
+  });
 }
 
 function orderCard(id, o, mode){

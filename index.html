@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <style>
@@ -676,8 +678,9 @@ function listenOrderStatus(orderId){
     if(!o) return;
     const status = o.status;
     if(status==='accepted' || status==='preparing' || status==='ready') setStep(2);
-    else if(status==='on_the_way'){ setStep(3); animateDriver(); }
+    else if(status==='on_the_way') setStep(3);
     else if(status==='delivered') setStep(4);
+    if(o.driverLat && o.driverLng) updateDriverMarker(o.driverLat, o.driverLng);
     if(o.driverName){
       const card = document.querySelector('.driver-card');
       if(card){
@@ -689,17 +692,16 @@ function listenOrderStatus(orderId){
   });
 }
 
-/* ---------------- TRACKING (driven by real cashier status via Firebase) ---------------- */
+/* ---------------- TRACKING (real live map via Leaflet + Firebase driver location) ---------------- */
+let trackMap = null, destMarker = null, driverMarker = null;
 function startTracking(){
   const el = document.getElementById('ordersContent');
   el.innerHTML = `
     <div class="map-box">
-      <svg viewBox="0 0 400 220">
-        <path d="M30 190 C 100 60, 260 180, 370 40" stroke="#cfc7ac" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <circle cx="30" cy="190" r="7" fill="#141311"/>
-        <circle cx="370" cy="40" r="7" fill="#F2B705"/>
-        <circle id="driverDot" cx="30" cy="190" r="9" fill="#E8542A"/>
-      </svg>
+      <div id="trackMap" style="width:100%; height:100%;"></div>
+      <div id="mapHint" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(251,249,244,.92); font-size:12.5px; color:var(--muted); text-align:center; padding:20px;">
+        السواق هيبان هنا على الخريطة أول ما ياخد طلبك
+      </div>
     </div>
     <div class="status-steps" id="steps">
       <div class="step done"><div class="dot"></div><span>تم إرسال طلبك للمطعم</span></div>
@@ -713,6 +715,30 @@ function startTracking(){
       <i class="ti ti-phone"></i>
     </div>
   `;
+  trackMap = null; destMarker = null; driverMarker = null;
+  const center = (state.location && !state.location.manual) ? [state.location.lat, state.location.lng] : [30.395, 30.549];
+  setTimeout(()=>{
+    trackMap = L.map('trackMap', {zoomControl:false, attributionControl:false}).setView(center, 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(trackMap);
+    if(state.location && !state.location.manual){
+      destMarker = L.circleMarker(center, {radius:8, color:'#141311', fillColor:'#F2B705', fillOpacity:1, weight:2}).addTo(trackMap);
+    }
+  }, 50);
+}
+function updateDriverMarker(lat, lng){
+  if(!trackMap) return;
+  document.getElementById('mapHint')?.remove();
+  if(!driverMarker){
+    const icon = L.divIcon({html:'<div style="background:#E8542A; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>', className:'', iconSize:[16,16]});
+    driverMarker = L.marker([lat,lng], {icon}).addTo(trackMap);
+  } else {
+    driverMarker.setLatLng([lat,lng]);
+  }
+  if(destMarker){
+    trackMap.fitBounds(L.latLngBounds([driverMarker.getLatLng(), destMarker.getLatLng()]), {padding:[30,30], maxZoom:16});
+  } else {
+    trackMap.setView([lat,lng], 15);
+  }
 }
 function setStep(n){
   document.querySelectorAll('#steps .step').forEach((s,i)=>{
@@ -720,20 +746,6 @@ function setStep(n){
     if(i < n-1) s.classList.add('done');
     else if(i === n-1) s.classList.add('now');
   });
-}
-function animateDriver(){
-  const dot = document.getElementById('driverDot');
-  const path = document.querySelector('.map-box path');
-  if(!dot||!path) return;
-  const len = path.getTotalLength();
-  const dur = 9000, start = performance.now();
-  function step(now){
-    const t = Math.min(1, (now-start)/dur);
-    const p = path.getPointAtLength(t*len);
-    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
-    if(t<1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
 }
 
 /* ---------------- IMAGE UPLOAD HELPER ---------------- */
