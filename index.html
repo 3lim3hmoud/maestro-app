@@ -403,6 +403,24 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
     </div>
   </div>
 
+  <!-- ================= OFFER DETAIL ================= -->
+  <div class="screen" id="screen-offer">
+    <div class="menu-header">
+      <div class="cover" id="offerCover" style="height:220px;"></div>
+      <div class="back" onclick="goBack()"><i class="ti ti-arrow-right"></i></div>
+    </div>
+    <div class="content" style="flex:1; padding:18px;">
+      <span class="tag" style="background:var(--gold); color:var(--ink); font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; display:inline-block; margin-bottom:10px;">عرض خاص</span>
+      <h2 id="offerTitle" style="font-size:20px; font-weight:900; margin-bottom:8px;">-</h2>
+      <p id="offerDesc" style="font-size:13.5px; color:var(--muted); line-height:1.7; margin-bottom:14px;"></p>
+      <div id="offerRest" style="font-size:12.5px; font-weight:700; color:var(--gold-deep); margin-bottom:16px;"></div>
+      <div id="offerPrice" style="font-size:19px; font-weight:900; font-family:'JetBrains Mono',monospace;"></div>
+    </div>
+    <div class="checkout-bar" style="display:block;">
+      <button class="btn-main" id="offerOrderBtn"><i class="ti ti-shopping-cart-plus"></i> اطلب العرض دلوقتي</button>
+    </div>
+  </div>
+
   <!-- ================= CART ================= -->
   <div class="screen" id="screen-cart">
     <div class="topbar"><div class="back-row" onclick="goBack()"><span class="circle"><i class="ti ti-arrow-right"></i></span> سلتك</div><div></div></div>
@@ -635,7 +653,7 @@ function toast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
-const stackScreens = ['screen-menu','screen-cart','screen-orders','screen-fav'];
+const stackScreens = ['screen-menu','screen-offer','screen-cart','screen-orders','screen-fav'];
 function go(id, fromPop){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','push-enter'));
   const next = document.getElementById(id);
@@ -698,9 +716,22 @@ function renderAds(){
     return;
   }
   wrap.innerHTML = state.ads.map((a,i)=>`
-    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.offerItems?`orderOffer(${i})`:(a.restId?`openMenu('${a.restId}')`:'')}"><span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p></div>
+    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.offerItems?`openOfferDetail(${i})`:(a.restId?`openMenu('${a.restId}')`:'')}"><span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p></div>
   `).join('');
   startAdsAutoplay();
+}
+function openOfferDetail(i){
+  const a = state.ads[i];
+  if(!a || !a.offerItems) return;
+  const r = state.restaurants.find(x=>x.id===a.restId);
+  document.getElementById('offerCover').style.backgroundImage = a.img?`url('${a.img}')`:'';
+  document.getElementById('offerTitle').textContent = a.title;
+  document.getElementById('offerDesc').textContent = a.desc || '';
+  document.getElementById('offerRest').innerHTML = r?`<i class="ti ti-building-store"></i> ${r.name}`:'';
+  const total = a.offerItems.reduce((s,oi)=>s+oi.price*(oi.qty||1),0);
+  document.getElementById('offerPrice').textContent = `${total} ج.م`;
+  document.getElementById('offerOrderBtn').setAttribute('onclick', `orderOffer(${i})`);
+  go('screen-offer');
 }
 function orderOffer(i){
   const a = state.ads[i];
@@ -779,7 +810,7 @@ function renderOffers(){
   }
   wrap.innerHTML = state.ads.map((a,i)=>{
     const r = state.restaurants.find(x=>x.id===a.restId);
-    const clickAction = a.offerItems?`orderOffer(${i})`:(a.restId?`openMenu('${a.restId}')`:'');
+    const clickAction = a.offerItems?`openOfferDetail(${i})`:(a.restId?`openMenu('${a.restId}')`:'');
     return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer; background-image:url('${a.img||''}');" onclick="${clickAction}">
       <span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p>
       ${r?`<p style="margin-top:6px; font-weight:700; color:var(--gold);"><i class="ti ti-building-store"></i> ${r.name} — اطلب الآن</p>`:''}
