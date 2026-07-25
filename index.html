@@ -179,6 +179,22 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .dish-big .db-price-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
 .dish-big .db-price{font-size:14px; font-weight:800; color:var(--gold-deep); font-family:'JetBrains Mono',monospace; white-space:nowrap;}
 .db-choose-btn{background:var(--ink); color:var(--gold); border:none; border-radius:20px; padding:9px 15px; font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:5px; font-family:inherit; box-shadow:0 3px 8px rgba(20,19,17,.25); white-space:nowrap;}
+.db-tap-hint{width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; box-shadow:0 3px 8px rgba(20,19,17,.25);}
+
+/* ---------- dish detail sheet (McDonald's style: image + info + qty + add) ---------- */
+.ds-hero{width:100%; aspect-ratio:16/10; border-radius:14px; background-size:cover; background-position:center; margin-bottom:14px; background-color:var(--panel);}
+.ds-desc{font-size:12.5px; color:var(--muted); line-height:1.7; margin-bottom:16px;}
+.ds-label{font-size:11px; color:var(--muted); font-weight:700; margin-bottom:9px;}
+.ds-sizes{display:flex; gap:9px; margin-bottom:18px; flex-wrap:wrap;}
+.ds-size-pill{flex:1; min-width:100px; border:1.5px solid var(--line-strong); border-radius:12px; padding:10px 12px; text-align:center; background:#fff;}
+.ds-size-pill.active{border-color:var(--ink); background:var(--panel); box-shadow:inset 0 0 0 1px var(--ink);}
+.ds-size-pill b{display:block; font-size:13.5px; margin-bottom:3px;}
+.ds-size-pill span{font-size:12px; color:var(--gold-deep); font-weight:700; font-family:'JetBrains Mono',monospace;}
+.ds-footer{display:flex; align-items:center; gap:11px; margin-top:6px;}
+.ds-qty{display:flex; align-items:center; gap:12px; border:1px solid var(--line-strong); border-radius:30px; padding:6px 14px; flex-shrink:0;}
+.ds-qty button{width:28px; height:28px; border-radius:50%; border:none; background:var(--panel); font-size:16px; display:flex; align-items:center; justify-content:center; color:var(--ink);}
+.ds-qty span{min-width:20px; text-align:center; font-weight:800; font-family:'JetBrains Mono',monospace;}
+.ds-add-btn{flex:1; background:var(--ink); color:var(--gold); border:none; border-radius:30px; padding:13px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 5px 14px rgba(20,19,17,.28);}
 
 /* ---------- size picker sheet ---------- */
 .size-opts{display:flex; flex-direction:column; gap:10px;}
@@ -500,8 +516,8 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
   </div>
 
   <!-- ADMIN SHEET -->
-  <div class="overlay" id="sizeSheetOverlay" onclick="if(event.target===this) closeSizeSheet()">
-    <div class="sheet" id="sizeSheetBody"></div>
+  <div class="overlay" id="dishSheetOverlay" onclick="if(event.target===this) closeDishSheet()">
+    <div class="sheet" id="dishSheetBody"></div>
   </div>
 
   <div class="overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
@@ -846,9 +862,8 @@ function openMenu(id){
     list.innerHTML = `<div class="empty-state"><i class="ti ti-tools-kitchen-2"></i><p>مفيش أصناف مضافة للمطعم ده لسه.<br>ضيفها من لوحة الإدارة ⚙</p></div>`;
   } else {
     list.innerHTML = r.dishes.map(d=>{
-      const hasSizes = Array.isArray(d.sizes) && d.sizes.length>0;
       const totalQty = dishCartQty(r.id, d.id);
-      return `<div class="dish-big"><div class="db-card">
+      return `<div class="dish-big" onclick="openDishDetail('${r.id}','${d.id}')"><div class="db-card">
         <div class="db-img-wrap">
           <div class="db-img ${d.img?'':'shimmer'}" style="background-image:url('${d.img||''}')"></div>
           ${totalQty>0?`<div class="db-cartbadge">${totalQty} في السلة</div>`:''}
@@ -858,13 +873,7 @@ function openMenu(id){
           ${d.desc?`<div class="db-desc">${d.desc}</div>`:''}
           <div class="db-price-row">
             <div class="db-price">${dishPriceLabel(d)}</div>
-            ${hasSizes
-              ? `<button class="db-choose-btn" onclick="openSizeSheet('${r.id}','${d.id}')"><i class="ti ti-plus" style="font-size:12px"></i> إضافة</button>`
-              : `<div class="qty-ctrl">
-                   ${totalQty>0?`<button onclick="changeQty('${r.id}','${d.id}',-1)">−</button><span>${totalQty}</span>`:''}
-                   <button class="add" onclick="changeQty('${r.id}','${d.id}',1,'${r.name.replace(/'/g,"")}','${d.name.replace(/'/g,"")}',${d.price})"><i class="ti ti-plus" style="font-size:13px"></i></button>
-                 </div>`
-            }
+            <div class="db-tap-hint"><i class="ti ti-plus" style="font-size:15px"></i></div>
           </div>
         </div>
       </div></div>`;
@@ -896,36 +905,77 @@ function changeQty(restId, dishId, delta, name, dname, price){
   openMenu(restId);
   updateCartBadge();
 }
-/* ---------------- SIZE PICKER (single/double etc.) ---------------- */
-function openSizeSheet(restId, dishId){
+/* ---------------- DISH DETAIL SHEET (image + info + qty + add, McDonald's style) ---------------- */
+let dsState = { restId:null, dishId:null, sizeKey:null, qty:1 };
+function openDishDetail(restId, dishId){
   const r = state.restaurants.find(x=>x.id===restId);
   const d = r && r.dishes.find(x=>x.id===dishId);
-  if(!d || !Array.isArray(d.sizes)) return;
-  const body = document.getElementById('sizeSheetBody');
-  body.innerHTML = `
-    <h3>${d.name}</h3>
-    ${d.desc?`<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">${d.desc}</div>`:''}
-    <div class="size-opts">
-      ${d.sizes.map(s=>{
-        const cid = `${d.id}::${s.key}`;
-        const qty = cartQty(restId, cid);
-        const safeRest = r.name.replace(/'/g,"");
-        const safeName = (d.name+' - '+s.label).replace(/'/g,"");
-        return `<div class="size-opt">
-          <div class="size-opt-info"><b>${s.label}</b><span class="size-opt-price">${s.price} ج.م</span></div>
-          <div class="qty-ctrl">
-            ${qty>0?`<button onclick="changeQty('${restId}','${cid}',-1);openSizeSheet('${restId}','${dishId}')">−</button><span>${qty}</span>`:''}
-            <button class="add" onclick="changeQty('${restId}','${cid}',1,'${safeRest}','${safeName}',${s.price});openSizeSheet('${restId}','${dishId}')"><i class="ti ti-plus" style="font-size:13px"></i></button>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-    <button class="btn-main" style="margin-top:16px;width:100%" onclick="closeSizeSheet()">تم</button>
-  `;
-  document.getElementById('sizeSheetOverlay').classList.add('active');
+  if(!d) return;
+  const hasSizes = Array.isArray(d.sizes) && d.sizes.length>0;
+  dsState = { restId, dishId, sizeKey: hasSizes ? d.sizes[0].key : null, qty: 1 };
+  renderDishSheet();
+  document.getElementById('dishSheetOverlay').classList.add('active');
 }
-function closeSizeSheet(){
-  document.getElementById('sizeSheetOverlay').classList.remove('active');
+function closeDishSheet(){
+  document.getElementById('dishSheetOverlay').classList.remove('active');
+}
+function pickDishSize(key){
+  dsState.sizeKey = key;
+  renderDishSheet();
+}
+function changeDishSheetQty(delta){
+  dsState.qty = Math.max(1, dsState.qty + delta);
+  renderDishSheet();
+}
+function renderDishSheet(){
+  const r = state.restaurants.find(x=>x.id===dsState.restId);
+  const d = r && r.dishes.find(x=>x.id===dsState.dishId);
+  if(!d) return;
+  const hasSizes = Array.isArray(d.sizes) && d.sizes.length>0;
+  const activeSize = hasSizes ? d.sizes.find(s=>s.key===dsState.sizeKey) || d.sizes[0] : null;
+  const unitPrice = hasSizes ? activeSize.price : d.price;
+  const total = unitPrice * dsState.qty;
+  const body = document.getElementById('dishSheetBody');
+  body.innerHTML = `
+    <div class="ds-hero ${d.img?'':'shimmer'}" style="background-image:url('${d.img||''}')"></div>
+    <h3>${d.name}</h3>
+    ${d.desc?`<div class="ds-desc">${d.desc}</div>`:''}
+    ${hasSizes ? `
+      <div class="ds-label">اختار الحجم</div>
+      <div class="ds-sizes">
+        ${d.sizes.map(s=>`
+          <div class="ds-size-pill ${s.key===activeSize.key?'active':''}" onclick="pickDishSize('${s.key}')">
+            <b>${s.label}</b><span>${s.price} ج.م</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+    <div class="ds-footer">
+      <div class="ds-qty">
+        <button onclick="changeDishSheetQty(-1)">−</button>
+        <span>${dsState.qty}</span>
+        <button onclick="changeDishSheetQty(1)">+</button>
+      </div>
+      <button class="ds-add-btn" onclick="addDishSheetToCart()"><i class="ti ti-shopping-cart-plus"></i> أضف للسلة · ${total} ج.م</button>
+    </div>
+  `;
+}
+function addDishSheetToCart(){
+  const r = state.restaurants.find(x=>x.id===dsState.restId);
+  const d = r && r.dishes.find(x=>x.id===dsState.dishId);
+  if(!d) return;
+  const hasSizes = Array.isArray(d.sizes) && d.sizes.length>0;
+  const activeSize = hasSizes ? d.sizes.find(s=>s.key===dsState.sizeKey) : null;
+  const cartDishId = hasSizes ? `${d.id}::${activeSize.key}` : d.id;
+  const cartName = hasSizes ? `${d.name} (${activeSize.label})` : d.name;
+  const cartPrice = hasSizes ? activeSize.price : d.price;
+  let it = state.cart.find(c=>c.restId===dsState.restId && c.dishId===cartDishId);
+  if(!it){ it = {restId:dsState.restId, dishId:cartDishId, name:cartName, price:cartPrice, qty:0}; state.cart.push(it); }
+  it.qty += dsState.qty;
+  closeDishSheet();
+  openMenu(dsState.restId);
+  updateCartBadge();
+  toast('تمت الإضافة للسلة');
 }
 function updateMenuCheckoutBar(){
   const total = state.cart.reduce((s,c)=>s+c.price*c.qty,0);
