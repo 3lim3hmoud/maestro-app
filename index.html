@@ -167,6 +167,26 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
 .qty-ctrl button.add{background:var(--ink); color:var(--gold); border-color:var(--ink); box-shadow:0 3px 8px rgba(20,19,17,.25);}
 .qty-ctrl span{font-size:13px; min-width:16px; text-align:center; font-family:'JetBrains Mono',monospace; font-weight:700;}
 
+/* ---------- big dish cards (image + add / size picker) ---------- */
+.dish-big{margin:0 0 16px;}
+.dish-big .db-card{background:#fff; border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--sh-md); border:1px solid var(--line);}
+.dish-big .db-img-wrap{position:relative; width:100%; aspect-ratio:16/10; background:var(--panel);}
+.dish-big .db-img{width:100%; height:100%; background-size:cover; background-position:center;}
+.dish-big .db-cartbadge{position:absolute; top:10px; inset-inline-start:10px; background:var(--ink); color:var(--gold); font-size:11px; font-weight:800; border-radius:20px; padding:4px 10px; font-family:'JetBrains Mono',monospace; box-shadow:0 3px 8px rgba(0,0,0,.25);}
+.dish-big .db-body{padding:14px 14px 15px;}
+.dish-big .db-body h5{font-size:15px; font-weight:800; margin-bottom:5px;}
+.dish-big .db-body .db-desc{font-size:11.5px; color:var(--muted); line-height:1.55; margin-bottom:11px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.dish-big .db-price-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.dish-big .db-price{font-size:14px; font-weight:800; color:var(--gold-deep); font-family:'JetBrains Mono',monospace; white-space:nowrap;}
+.db-choose-btn{background:var(--ink); color:var(--gold); border:none; border-radius:20px; padding:9px 15px; font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:5px; font-family:inherit; box-shadow:0 3px 8px rgba(20,19,17,.25); white-space:nowrap;}
+
+/* ---------- size picker sheet ---------- */
+.size-opts{display:flex; flex-direction:column; gap:10px;}
+.size-opt{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--panel);}
+.size-opt-info{display:flex; flex-direction:column; gap:4px;}
+.size-opt-info b{font-size:14px;}
+.size-opt-price{font-size:12.5px; color:var(--gold-deep); font-weight:700; font-family:'JetBrains Mono',monospace;}
+
 /* ---------- checkout bar ---------- */
 .checkout-bar{position:absolute; bottom:0; left:0; right:0; max-width:430px; margin:0 auto; padding:13px 18px; background:#fff; border-top:1px solid var(--line); box-shadow:0 -8px 20px rgba(20,19,17,.06);}
 .btn-main{width:100%; background:linear-gradient(135deg,var(--gold-soft),var(--gold)); color:var(--ink); border:none; border-radius:var(--r-md); padding:14px; font-family:inherit; font-weight:900; font-size:14.5px; display:flex; align-items:center; justify-content:center; gap:9px; letter-spacing:.2px; box-shadow:var(--sh-gold);}
@@ -462,6 +482,10 @@ button:active, .rest-card:active, .ad-card:active, .chip:active, .admin-item:act
   </div>
 
   <!-- ADMIN SHEET -->
+  <div class="overlay" id="sizeSheetOverlay" onclick="if(event.target===this) closeSizeSheet()">
+    <div class="sheet" id="sizeSheetBody"></div>
+  </div>
+
   <div class="overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
     <div class="sheet">
       <div class="close-x" onclick="closeAdmin()"><i class="ti ti-x"></i></div>
@@ -544,89 +568,37 @@ let state = {
       cat: 'برجر ودجاج',
       time: '25-35 دقيقة',
       dishes: [
-        { id: 'lr1', name: 'بيج فيلر كلاسيك', price: 135, img: '' },
-        { id: 'lr2', name: 'بيج فيلر هالبينو', price: 135, img: '' },
-        { id: 'lr3', name: 'تشيزو باربيكيو', price: 140, img: '' },
-        { id: 'lr4', name: 'زنجر سوبريم', price: 135, img: '' },
-        { id: 'lr5', name: 'فيلية سوبريم', price: 135, img: '' },
-        { id: 'lr6', name: 'ساندويتش توستر', price: 80, img: '' },
-        { id: 'lr7', name: 'توستر سموكي باربيكيو', price: 90, img: '' },
-        { id: 'lr8', name: 'توستر تشيز هالبينو', price: 90, img: '' },
-        { id: 'lr9', name: 'كلاسيك تشيز برجر (سنجل)', price: 115, img: '' },
-        { id: 'lr10', name: 'كلاسيك تشيز برجر (دبل)', price: 180, img: '' },
-        { id: 'lr11', name: 'كلاسيك برجر (سنجل)', price: 105, img: '' },
-        { id: 'lr12', name: 'كلاسيك برجر (دبل)', price: 170, img: '' },
-        { id: 'lr13', name: 'أمريكان برجر (سنجل)', price: 125, img: '' },
-        { id: 'lr14', name: 'أمريكان برجر (دبل)', price: 195, img: '' },
-        { id: 'lr15', name: 'أرباكي برجر (سنجل)', price: 150, img: '' },
-        { id: 'lr16', name: 'أرباكي برجر (دبل)', price: 210, img: '' },
-        { id: 'lr17', name: 'بيف تيستي (سنجل)', price: 115, img: '' },
-        { id: 'lr18', name: 'بيف تيستي (دبل)', price: 185, img: '' },
-        { id: 'lr19', name: 'بيكون برجر (سنجل)', price: 135, img: '' },
-        { id: 'lr20', name: 'بيكون برجر (دبل)', price: 200, img: '' },
-        { id: 'lr21', name: 'رانشيلو برجر (سنجل)', price: 130, img: '' },
-        { id: 'lr22', name: 'رانشيلو برجر (دبل)', price: 195, img: '' },
-        { id: 'lr23', name: 'إكستريم برجر (سنجل)', price: 125, img: '' },
-        { id: 'lr24', name: 'إكستريم برجر (دبل)', price: 195, img: '' },
-        { id: 'lr25', name: 'سموكي روكن برجر (سنجل)', price: 120, img: '' },
-        { id: 'lr26', name: 'سموكي روكن برجر (دبل)', price: 185, img: '' },
-        { id: 'lr27', name: 'موالن برجر (سنجل)', price: 145, img: '' },
-        { id: 'lr28', name: 'موالن برجر (دبل)', price: 205, img: '' },
-        { id: 'lr29', name: 'بكينال برجر (سنجل)', price: 145, img: '' },
-        { id: 'lr30', name: 'بكينال برجر (دبل)', price: 205, img: '' },
-        { id: 'lr31', name: 'فولكانو برجر (سنجل)', price: 140, img: '' },
-        { id: 'lr32', name: 'فولكانو برجر (دبل)', price: 200, img: '' },
-        { id: 'lr33', name: 'مايتي زنجر (سنجل)', price: 110, img: '' },
-        { id: 'lr34', name: 'مايتي زنجر (دبل)', price: 170, img: '' },
-        { id: 'lr35', name: 'أكساس تشيكن (سنجل)', price: 125, img: '' },
-        { id: 'lr36', name: 'أكساس تشيكن (دبل)', price: 185, img: '' },
-        { id: 'lr37', name: 'تشيكن سوبر شيلي (سنجل)', price: 145, img: '' },
-        { id: 'lr38', name: 'تشيكن سوبر شيلي (دبل)', price: 200, img: '' },
-        { id: 'lr39', name: 'بومر فيليه (سنجل)', price: 150, img: '' },
-        { id: 'lr40', name: 'بومر فيليه (دبل)', price: 210, img: '' },
-        { id: 'lr41', name: 'تشيكن رانشر (سنجل)', price: 120, img: '' },
-        { id: 'lr42', name: 'تشيكن رانشر (دبل)', price: 180, img: '' },
-        { id: 'lr43', name: 'تشيكن شيز ديب (سنجل)', price: 145, img: '' },
-        { id: 'lr44', name: 'تشيكن شيز ديب (دبل)', price: 200, img: '' },
-        { id: 'lr45', name: 'راوند تشيكن جريل (سنجل)', price: 115, img: '' },
-        { id: 'lr46', name: 'راوند تشيكن جريل (دبل)', price: 170, img: '' },
-        { id: 'lr47', name: 'تشيكن بريمو (سنجل)', price: 115, img: '' },
-        { id: 'lr48', name: 'تشيكن بريمو (دبل)', price: 175, img: '' },
-        { id: 'lr49', name: 'تشيكن بيكون (سنجل)', price: 140, img: '' },
-        { id: 'lr50', name: 'تشيكن بيكون (دبل)', price: 200, img: '' },
-        { id: 'lr51', name: 'تشيكن مشروم (سنجل)', price: 135, img: '' },
-        { id: 'lr52', name: 'تشيكن مشروم (دبل)', price: 195, img: '' },
-        { id: 'lr53', name: 'شيكانو فرايز', price: 130, img: '' },
-        { id: 'lr54', name: 'بيتزا فرايد تشيكن', price: 200, img: '' },
-        { id: 'lr55', name: 'تشيزو فرايز', price: 70, img: '' },
-        { id: 'lr56', name: 'سبيشيال فرينش فرايز', price: 90, img: '' },
-        { id: 'lr57', name: 'تشيكن وينجز', price: 120, img: '' },
-        { id: 'lr58', name: 'ريزو دجاج', price: 120, img: '' },
-        { id: 'lr59', name: 'وجبة تشيكن برجر (أطفال)', price: 130, img: '' },
-        { id: 'lr60', name: 'وجبة استربس (أطفال)', price: 130, img: '' },
-        { id: 'lr61', name: 'وجبة بيف برجر (أطفال)', price: 140, img: '' },
-        { id: 'lr62', name: 'سناك بوكس', price: 135, img: '' },
-        { id: 'lr63', name: 'سوبر سناك', price: 155, img: '' },
-        { id: 'lr64', name: 'دينر ميل', price: 190, img: '' },
-        { id: 'lr65', name: 'سوبر دينر', price: 210, img: '' },
-        { id: 'lr66', name: 'دينر بوكس', price: 255, img: '' },
-        { id: 'lr67', name: 'هابي ميل', price: 195, img: '' },
-        { id: 'lr68', name: 'سوبر بوكس (عائلي)', price: 520, img: '' },
-        { id: 'lr69', name: 'فاميلي ميل', price: 690, img: '' },
-        { id: 'lr70', name: 'الوجبة الاقتصادية', price: 840, img: '' },
-        { id: 'lr71', name: 'بارتي ميل', price: 990, img: '' },
-        { id: 'lr72', name: 'فاميلي ميكس', price: 560, img: '' },
-        { id: 'lr73', name: 'سناك استربس', price: 125, img: '' },
-        { id: 'lr74', name: 'دينر استربس', price: 180, img: '' },
-        { id: 'lr75', name: 'سوبر استربس', price: 200, img: '' },
-        { id: 'lr76', name: 'فاميلي استربس', price: 510, img: '' },
-        { id: 'lr77', name: 'بارتي استربس', price: 820, img: '' },
-        { id: 'lr78', name: 'مياة صغير', price: 10, img: '' },
-        { id: 'lr79', name: 'بيبسي كانز', price: 25, img: '' },
-        { id: 'lr80', name: 'بيبسي 1 لتر', price: 40, img: '' },
-        { id: 'lr81', name: 'كولا ماشين 300ML', price: 30, img: '' },
-        { id: 'lr82', name: 'كولا ماشين 400ML', price: 35, img: '' },
-        { id: 'lr83', name: 'Combo', price: 45, img: '' }
+        { id: 'lr-fillet-supreme', name: 'فيلية سوبريم', price: 135, img: './images/la-rotunda/fillet-supreme.jpg', desc: 'قطع الدجاج المقرمش والتركي المدخن وشرائح الشيدر وصوص التايشيلي وشرائح الطماطم' },
+        { id: 'lr-bacon-burger', name: 'بيكون برجر', img: './images/la-rotunda/bacon-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع البيف بيكون وصوص الجبنة الشيدر وصوص الباربيكيو والخس والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:135}, {key:'d', label:'دبل', price:200}] },
+        { id: 'lr-chicken-rizo', name: 'ريزو دجاج', price: 120, img: './images/la-rotunda/chicken-rizo.jpg', desc: 'الأرز المبهر وقطع الدجاج وصوص النكهر أو الباربيكيو' },
+        { id: 'lr-cheeso-barbecue', name: 'تشيزو باربيكيو', price: 140, img: './images/la-rotunda/cheeso-barbecue.jpg', desc: 'قطع الدجاج المقرمش وشرائح السلامي وصوص الجبنة وصوص الباربيكيو' },
+        { id: 'lr-big-filler-classic', name: 'بيج فيلر كلاسيك', price: 135, img: './images/la-rotunda/big-filler-classic.jpg', desc: 'قطع الدجاج المقرمش والتركي المدخن وشرائح الشيدر وصوص المايونيز المدخن والخيار المخلل' },
+        { id: 'lr-big-filler-jalapeno', name: 'بيج فيلر هالبينو', price: 135, img: './images/la-rotunda/big-filler-jalapeno.jpg', desc: 'قطع الدجاج المقرمش الحار والتركي المدخن وشرائح الشيدر وصوص المايونيز المدخن وفلفل الهالبينو' },
+        { id: 'lr-cheeso-fries', name: 'تشيزو فرايز', price: 70, img: './images/la-rotunda/cheeso-fries.jpg', desc: 'البطاطس المقلية وصوص الجبنة' },
+        { id: 'lr-zinger-supreme', name: 'زنجر سوبريم', price: 135, img: './images/la-rotunda/zinger-supreme.jpg', desc: 'قطع الدجاج المقرمش الحار والتركي المدخن وشرائح الشيدر وصوص التايشيلي والخيار المخلل' },
+        { id: 'lr-american-burger', name: 'أمريكان برجر', img: './images/la-rotunda/american-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع شرائح النبيذ الأمريكي وشرائح السالامي وصوص الأيلاند والخس والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:125}, {key:'d', label:'دبل', price:195}] },
+        { id: 'lr-tribaki-burger', name: 'تريباكي برجر', img: './images/la-rotunda/tribaki-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع شرائح الدجاج المقلي والروزبيف وصوص الجبنة الشيدر والخس والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:150}, {key:'d', label:'دبل', price:210}] },
+        { id: 'lr-chicken-bacon', name: 'تشيكن بيكون', img: './images/la-rotunda/chicken-bacon.jpg', desc: 'شرائح الدجاج المقرمش والبيف بيكون وصوص الجبنة الشيدر وصوص الباربيكيو', sizes: [{key:'s', label:'سنجل', price:140}, {key:'d', label:'دبل', price:200}] },
+        { id: 'lr-ranchello-burger', name: 'رانشيلو برجر', img: './images/la-rotunda/ranchello-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع شرائح السلامي والتركي المدخن وشرائح الشيدر الأمريكي وصوص الرانش والخس والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:130}, {key:'d', label:'دبل', price:195}] },
+        { id: 'lr-boomer-fillet', name: 'بومر فيليه', img: './images/la-rotunda/boomer-fillet.jpg', desc: 'شرائح الدجاج المقرمش مع شرائح الروزبيف وأصابع الجبنة وحلقات البصل وصوص الجبنة الأيلاند مع الخيار المخلل', sizes: [{key:'s', label:'سنجل', price:150}, {key:'d', label:'دبل', price:210}] },
+        { id: 'lr-chicken-sweet-chili', name: 'تشيكن سويت شيلي', img: './images/la-rotunda/chicken-sweet-chili.jpg', desc: 'شرائح الدجاج المقرمش مع شرائح الروزبيف وحلقات البصل وشرائح الشيدر الأمريكي مع صوص السويت شيلي', sizes: [{key:'s', label:'سنجل', price:145}, {key:'d', label:'دبل', price:200}] },
+        { id: 'lr-texas-chicken', name: 'تكساس تشيكن', img: './images/la-rotunda/texas-chicken.jpg', desc: 'شرائح الدجاج المقرمش مع التركي المدخن والشيدر وصوص التكساس المميز مع البصل الفريش', sizes: [{key:'s', label:'سنجل', price:125}, {key:'d', label:'دبل', price:185}] },
+        { id: 'lr-round-chicken-grill', name: 'راوند تشيكن جريل', img: './images/la-rotunda/round-chicken-grill.jpg', desc: 'شرائح الدجاج المشوي مع شرائح الجبنة الشيدر والطماطم', sizes: [{key:'s', label:'سنجل', price:115}, {key:'d', label:'دبل', price:170}] },
+        { id: 'lr-chicken-rancher', name: 'تشيكن رانشر', img: './images/la-rotunda/chicken-rancher.jpg', desc: 'شرائح الدجاج المقرمش مع التركي المدخن وصوص الرانش وصوص الجبنة مع الطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:120}, {key:'d', label:'دبل', price:180}] },
+        { id: 'lr-pizza-fried-chicken', name: 'بيتزا فرايد تشيكن', price: 200, img: './images/la-rotunda/pizza-fried-chicken.jpg', desc: 'قطع الدجاج المقلي المغطاه بصوص الجبنة والجبنة الموزريلا وشرائح السلامي والفلفل الألوان وشرائح الزيتون' },
+        { id: 'lr-beef-tasty', name: 'بيف تيستي', img: './images/la-rotunda/beef-tasty.jpg', desc: 'برجر اللحم المشوي علي اللهب مع شرائح الشيدر وصوص التكساس والخس والطماطم والخيار المخلل والبصل الفريش', sizes: [{key:'s', label:'سنجل', price:115}, {key:'d', label:'دبل', price:185}] },
+        { id: 'lr-mighty-zinger', name: 'مايتي زنجر', img: './images/la-rotunda/mighty-zinger.jpg', desc: 'شرائح الدجاج المقرمش مع الجبنة الشيدر والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:110}, {key:'d', label:'دبل', price:170}] },
+        { id: 'lr-volcano-burger', name: 'فولكانو برجر', img: './images/la-rotunda/volcano-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع حلقات البصل المقلي وصوص الشيدر وصوص السويت شيلي والخس والطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:140}, {key:'d', label:'دبل', price:200}] },
+        { id: 'lr-special-french-fries', name: 'سبيشيال فرينش فرايز', price: 90, img: './images/la-rotunda/special-french-fries.jpg', desc: 'البطاطس المقلية وصوص الجبنة وصوص الأيلاند وصوص الرانش وشرائح الهالبينو' },
+        { id: 'lr-chicano-fries', name: 'شيكانو فرايز', price: 130, img: './images/la-rotunda/chicano-fries.jpg', desc: 'البطاطس المقلية وقطع الدجاج المقرمش مع صوص الجبنة والفلفل الهالبينو' },
+        { id: 'lr-chicken-cheez-dip', name: 'تشيكن شيز ديب', img: './images/la-rotunda/chicken-cheez-dip.jpg', desc: 'شرائح الدجاج المقرمش مع أصابع الجبنة والتركي المدخن وصوص الجبنة وصوص تشيز ديب المميز', sizes: [{key:'s', label:'سنجل', price:145}, {key:'d', label:'دبل', price:200}] },
+        { id: 'lr-smoky-rocken-burger', name: 'سموكي روكن برجر', img: './images/la-rotunda/smoky-rocken-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع التركي المدخن وشرائح الشيدر وصوص المايونيز المدخن والخس والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:120}, {key:'d', label:'دبل', price:185}] },
+        { id: 'lr-chicken-wings', name: 'تشيكن وينجز', price: 120, img: './images/la-rotunda/chicken-wings.jpg', desc: '6 قطع أجنحة، بطاطس، صوص سويت شيلي، صوص أيلاند' },
+        { id: 'lr-extreme-burger', name: 'إكستريم برجر', img: './images/la-rotunda/extreme-burger.jpg', desc: 'برجر اللحم المشوي علي اللهب مع البصل المكرمل وشرائح الروزبيف وصوص الجبنة الشيح والخس والخيار المخلل وقطع المشروم', sizes: [{key:'s', label:'سنجل', price:125}, {key:'d', label:'دبل', price:195}] },
+        { id: 'lr-chicken-premo', name: 'تشيكن بريمو', img: './images/la-rotunda/chicken-premo.jpg', desc: 'شرائح الدجاج المقرمش مع الجبنة الشيدر وصوص الأيلاند المميز مع الطماطم والخيار المخلل', sizes: [{key:'s', label:'سنجل', price:115}, {key:'d', label:'دبل', price:175}] },
+        { id: 'lr-moalan-burger', name: 'موالن برجر', img: './images/la-rotunda/moalan-burger.jpg', desc: '150 جم من لحم البرجر الخاص المشوي على اللهب المحشو بالتركي المدخن والجبنة الموزريلا وأصابع الجبنة الموزريلا', sizes: [{key:'s', label:'سنجل', price:145}, {key:'d', label:'دبل', price:205}] },
+        { id: 'lr-bakinal-burger', name: 'بكيني برجر', img: './images/la-rotunda/bakinal-burger.jpg', desc: 'برجر اللحم المشوي على اللهب مع شرائح الهوت دوج البكيني وقطع الفلفل الألوان والبصل وشرائح الشيدر وصوص الباربيكيو', sizes: [{key:'s', label:'سنجل', price:145}, {key:'d', label:'دبل', price:205}] },
+        { id: 'lr-chicken-mushroom', name: 'تشيكن مشروم', img: './images/la-rotunda/chicken-mushroom.jpg', desc: 'شرائح الدجاج المقرمش وشرائح المشروم والتركي المدخن وشرائح الشيدر الأمريكي وصوص المايونيز المدخن', sizes: [{key:'s', label:'سنجل', price:135}, {key:'d', label:'دبل', price:195}] }
       ]
     },
     {
@@ -862,15 +834,28 @@ function openMenu(id){
     list.innerHTML = `<div class="empty-state"><i class="ti ti-tools-kitchen-2"></i><p>مفيش أصناف مضافة للمطعم ده لسه.<br>ضيفها من لوحة الإدارة ⚙</p></div>`;
   } else {
     list.innerHTML = r.dishes.map(d=>{
-      const qty = cartQty(r.id, d.id);
-      return `<div class="dish">
-        <div class="d-thumb ${d.img?'':'shimmer'}" style="background-image:url('${d.img||''}')"></div>
-        <div class="d-info"><h5>${d.name}</h5><div class="price">${d.price} ج.م</div></div>
-        <div class="qty-ctrl">
-          ${qty>0?`<button onclick="changeQty('${r.id}','${d.id}',-1)">−</button><span>${qty}</span>`:''}
-          <button class="add" onclick="changeQty('${r.id}','${d.id}',1,'${r.name.replace(/'/g,"")}','${d.name.replace(/'/g,"")}',${d.price})"><i class="ti ti-plus" style="font-size:13px"></i></button>
+      const hasSizes = Array.isArray(d.sizes) && d.sizes.length>0;
+      const totalQty = dishCartQty(r.id, d.id);
+      return `<div class="dish-big"><div class="db-card">
+        <div class="db-img-wrap">
+          <div class="db-img ${d.img?'':'shimmer'}" style="background-image:url('${d.img||''}')"></div>
+          ${totalQty>0?`<div class="db-cartbadge">${totalQty} في السلة</div>`:''}
         </div>
-      </div>`;
+        <div class="db-body">
+          <h5>${d.name}</h5>
+          ${d.desc?`<div class="db-desc">${d.desc}</div>`:''}
+          <div class="db-price-row">
+            <div class="db-price">${dishPriceLabel(d)}</div>
+            ${hasSizes
+              ? `<button class="db-choose-btn" onclick="openSizeSheet('${r.id}','${d.id}')"><i class="ti ti-plus" style="font-size:12px"></i> إضافة</button>`
+              : `<div class="qty-ctrl">
+                   ${totalQty>0?`<button onclick="changeQty('${r.id}','${d.id}',-1)">−</button><span>${totalQty}</span>`:''}
+                   <button class="add" onclick="changeQty('${r.id}','${d.id}',1,'${r.name.replace(/'/g,"")}','${d.name.replace(/'/g,"")}',${d.price})"><i class="ti ti-plus" style="font-size:13px"></i></button>
+                 </div>`
+            }
+          </div>
+        </div>
+      </div></div>`;
     }).join('');
   }
   updateMenuCheckoutBar();
@@ -880,12 +865,55 @@ function cartQty(restId, dishId){
   const it = state.cart.find(c=>c.restId===restId && c.dishId===dishId);
   return it ? it.qty : 0;
 }
+/* sums qty across a dish's variants too, e.g. base id + base::s + base::d */
+function dishCartQty(restId, baseDishId){
+  return state.cart.filter(c=>c.restId===restId && (c.dishId===baseDishId || c.dishId.startsWith(baseDishId+'::'))).reduce((s,c)=>s+c.qty,0);
+}
+function dishPriceLabel(d){
+  if(Array.isArray(d.sizes) && d.sizes.length>0){
+    const prices = d.sizes.map(s=>s.price);
+    const min = Math.min(...prices), max = Math.max(...prices);
+    return min===max ? `${min} ج.م` : `${min}–${max} ج.م`;
+  }
+  return `${d.price} ج.م`;
+}
 function changeQty(restId, dishId, delta, name, dname, price){
   let it = state.cart.find(c=>c.restId===restId && c.dishId===dishId);
   if(!it && delta>0){ it = {restId,dishId,name:dname,price,qty:0}; state.cart.push(it); }
   if(it){ it.qty += delta; if(it.qty<=0) state.cart = state.cart.filter(c=>c!==it); }
   openMenu(restId);
   updateCartBadge();
+}
+/* ---------------- SIZE PICKER (single/double etc.) ---------------- */
+function openSizeSheet(restId, dishId){
+  const r = state.restaurants.find(x=>x.id===restId);
+  const d = r && r.dishes.find(x=>x.id===dishId);
+  if(!d || !Array.isArray(d.sizes)) return;
+  const body = document.getElementById('sizeSheetBody');
+  body.innerHTML = `
+    <h3>${d.name}</h3>
+    ${d.desc?`<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">${d.desc}</div>`:''}
+    <div class="size-opts">
+      ${d.sizes.map(s=>{
+        const cid = `${d.id}::${s.key}`;
+        const qty = cartQty(restId, cid);
+        const safeRest = r.name.replace(/'/g,"");
+        const safeName = (d.name+' - '+s.label).replace(/'/g,"");
+        return `<div class="size-opt">
+          <div class="size-opt-info"><b>${s.label}</b><span class="size-opt-price">${s.price} ج.م</span></div>
+          <div class="qty-ctrl">
+            ${qty>0?`<button onclick="changeQty('${restId}','${cid}',-1);openSizeSheet('${restId}','${dishId}')">−</button><span>${qty}</span>`:''}
+            <button class="add" onclick="changeQty('${restId}','${cid}',1,'${safeRest}','${safeName}',${s.price});openSizeSheet('${restId}','${dishId}')"><i class="ti ti-plus" style="font-size:13px"></i></button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <button class="btn-main" style="margin-top:16px;width:100%" onclick="closeSizeSheet()">تم</button>
+  `;
+  document.getElementById('sizeSheetOverlay').classList.add('active');
+}
+function closeSizeSheet(){
+  document.getElementById('sizeSheetOverlay').classList.remove('active');
 }
 function updateMenuCheckoutBar(){
   const total = state.cart.reduce((s,c)=>s+c.price*c.qty,0);
