@@ -498,10 +498,20 @@ let state = {
         { id: 'ka-2', name: 'كشري لوكس', price: 35, img: './images/koshary-afandina/dish-lux.png' },
         { id: 'ka-3', name: 'كشري ممتاز', price: 45, img: './images/koshary-afandina/dish-momtaz.png' }
       ]
+    },
+    {
+      id: 'la-rotunda',
+      name: 'La Rotunda',
+      img: './images/la-rotunda/cover.jpg',
+      cat: 'برجر ودجاج',
+      time: '25-35 دقيقة',
+      dishes: []
     }
   ],
   ads: [
-    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina' }
+    { title: 'رجعناكم من جديد', desc: 'الكشري إلي على مزاجك — كشري أفندينا', img: './images/koshary-afandina/ad-banner.png', restId: 'koshary-afandina' },
+    { title: 'اشتري 1 واحصل على التاني بخصم 50%', desc: 'La Rotunda — عرض لفترة محدودة', img: './images/la-rotunda/offer-buy1get50.png', restId: 'la-rotunda',
+      offerItems: [{name:'وجبة بروستد (عرض 1+50%)', price:150, qty:1}] }
   ],
   wallet: { vodafone: '01000000000', instapay: '01000000000@instapay' },
   cart: [],
@@ -588,10 +598,20 @@ function renderAds(){
     wrap.innerHTML = `<div class="ad-empty">لا توجد إعلانات مضافة — أضِفها من لوحة الإدارة (⚙)</div>`;
     return;
   }
-  wrap.innerHTML = state.ads.map(a=>`
-    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.restId?`openMenu('${a.restId}')`:''}"><span class="tag">عرض</span><h3>${a.title}</h3><p>${a.desc}</p></div>
+  wrap.innerHTML = state.ads.map((a,i)=>`
+    <div class="ad-card" style="background-image:url('${a.img||''}'); cursor:pointer;" onclick="${a.offerItems?`orderOffer(${i})`:(a.restId?`openMenu('${a.restId}')`:'')}"><span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p></div>
   `).join('');
   startAdsAutoplay();
+}
+function orderOffer(i){
+  const a = state.ads[i];
+  if(!a || !a.offerItems) return;
+  a.offerItems.forEach(oi=>{
+    state.cart.push({restId:a.restId, dishId:'offer-'+i+'-'+oi.name, name:oi.name, price:oi.price, qty:oi.qty||1});
+  });
+  updateCartBadge();
+  go('screen-cart');
+  toast('تمت إضافة العرض لسلتك — كمّل بياناتك وأكّد الطلب');
 }
 
 let adsTimer=null, adsIndex=0, adsPauseTimeout=null;
@@ -652,10 +672,11 @@ function renderOffers(){
     wrap.innerHTML = `<div class="empty-state"><i class="ti ti-discount-2"></i><p>لسه مفيش عروض مضافة.<br>ضيفها من لوحة الإدارة ⚙</p></div>`;
     return;
   }
-  wrap.innerHTML = state.ads.map(a=>{
+  wrap.innerHTML = state.ads.map((a,i)=>{
     const r = state.restaurants.find(x=>x.id===a.restId);
-    return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer;" onclick="${a.restId?`openMenu('${a.restId}')`:''}">
-      <span class="tag">عرض</span><h3>${a.title}</h3><p>${a.desc}</p>
+    const clickAction = a.offerItems?`orderOffer(${i})`:(a.restId?`openMenu('${a.restId}')`:'');
+    return `<div class="ad-card" style="min-width:100%; height:150px; margin-bottom:14px; cursor:pointer;" onclick="${clickAction}">
+      <span class="tag">${a.offerItems?'اطلب العرض دلوقتي':'عرض'}</span><h3>${a.title}</h3><p>${a.desc}</p>
       ${r?`<p style="margin-top:6px; font-weight:700; color:var(--gold);"><i class="ti ti-building-store"></i> ${r.name} — اطلب الآن</p>`:''}
     </div>`;
   }).join('');
